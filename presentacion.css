@@ -1,0 +1,1180 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    overflow: hidden;
+    background: #063d3b;
+}
+
+
+/* =====================================================
+   FONDO SELVA
+===================================================== */
+
+.fondo {
+    position: fixed;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+
+    background-image:
+
+        linear-gradient(
+            90deg,
+            rgba(0, 40, 42, 0.94) 0%,
+            rgba(0, 65, 62, 0.82) 32%,
+            rgba(0, 78, 69, 0.55) 60%,
+            rgba(0, 35, 35, 0.45) 100%
+        ),
+
+        url("img/selva.jpg");
+
+    background-size: cover;
+
+    background-position: center center;
+
+    background-repeat: no-repeat;
+
+    z-index: -10;
+}
+
+
+.fondo::before {
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(0, 45, 43, 0.35),
+            transparent 35%,
+            rgba(0, 35, 35, 0.50)
+        );
+}
+
+
+.fondo::after {
+    content: "";
+
+    position: absolute;
+
+    width: 700px;
+    height: 700px;
+
+    right: -250px;
+    top: -300px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(45, 230, 180, 0.15);
+
+    filter: blur(80px);
+}
+
+
+/* =====================================================
+   ONDAS
+===================================================== */
+
+.onda {
+    position: absolute;
+
+    border-radius: 50%;
+
+    border:
+        1px solid
+        rgba(255,255,255,0.16);
+
+    pointer-events: none;
+}
+
+.onda-1 {
+    width: 700px;
+    height: 700px;
+
+    right: -350px;
+    top: -320px;
+}
+
+.onda-2 {
+    width: 520px;
+    height: 520px;
+
+    right: -260px;
+    top: -230px;
+}
+
+.onda-3 {
+    width: 350px;
+    height: 350px;
+
+    right: -175px;
+    top: -145px;
+}
+
+
+/* =====================================================
+   PUNTOS
+===================================================== */
+
+.punto {
+    position: absolute;
+
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: #a9ffdb;
+
+    box-shadow:
+        0 0 15px #a9ffdb;
+
+    opacity: .7;
+
+    animation:
+        flotar 4s ease-in-out infinite;
+}
+
+.punto-1 {
+    left: 7%;
+    top: 20%;
+}
+
+.punto-2 {
+    left: 43%;
+    top: 12%;
+
+    animation-delay: 1s;
+}
+
+.punto-3 {
+    left: 25%;
+    bottom: 14%;
+
+    animation-delay: 2s;
+}
+
+
+@keyframes flotar {
+
+    0%,
+    100% {
+        transform: translateY(0);
+        opacity: .4;
+    }
+
+    50% {
+        transform: translateY(-12px);
+        opacity: 1;
+    }
+}
+
+
+/* =====================================================
+   PÁGINA
+===================================================== */
+
+.pagina {
+
+    width: min(1400px, 94%);
+
+    height: 100vh;
+
+    margin: auto;
+
+    position: relative;
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.header {
+
+    height: 95px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 0 10px;
+}
+
+
+.identidad {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+}
+
+
+.logo {
+
+    width: 65px;
+    height: 65px;
+
+    padding: 6px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background: white;
+
+    border-radius: 15px;
+
+    box-shadow:
+        0 10px 30px
+        rgba(0,0,0,.22);
+}
+
+
+.logo img {
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+}
+
+
+.identidad-texto strong {
+
+    display: block;
+
+    color: white;
+
+    font-size: 15px;
+
+    line-height: 1.15;
+
+    font-weight: 800;
+}
+
+
+.identidad-texto span {
+
+    display: block;
+
+    margin-top: 5px;
+
+    color:
+        rgba(255,255,255,.70);
+
+    font-size: 9px;
+
+    line-height: 1.25;
+}
+
+
+/* =====================================================
+   ESTADO
+===================================================== */
+
+.estado {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    padding: 10px 16px;
+
+    color: white;
+
+    background:
+        rgba(0,50,48,.50);
+
+    border:
+        1px solid
+        rgba(255,255,255,.20);
+
+    border-radius: 30px;
+
+    backdrop-filter: blur(12px);
+
+    font-size: 10px;
+
+    font-weight: 800;
+}
+
+
+.estado-punto {
+
+    width: 9px;
+    height: 9px;
+
+    border-radius: 50%;
+
+    background: #35e890;
+
+    box-shadow:
+        0 0 0 4px
+        rgba(53,232,144,.15),
+
+        0 0 15px
+        #35e890;
+}
+
+
+/* =====================================================
+   CONTENIDO
+===================================================== */
+
+.contenido {
+
+    flex: 1;
+
+    display: grid;
+
+    grid-template-columns: 56% 44%;
+
+    align-items: center;
+}
+
+
+/* =====================================================
+   PANEL IZQUIERDO
+===================================================== */
+
+.contenido-izquierda {
+
+    position: relative;
+
+    z-index: 5;
+
+    padding: 40px;
+
+    max-width: 760px;
+
+    background:
+        rgba(0,40,42,.48);
+
+    border:
+        1px solid
+        rgba(255,255,255,.15);
+
+    border-radius: 25px;
+
+    backdrop-filter: blur(10px);
+
+    box-shadow:
+        0 25px 70px
+        rgba(0,0,0,.22);
+}
+
+
+/* =====================================================
+   ETIQUETA
+===================================================== */
+
+.etiqueta {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 9px 15px;
+
+    margin-bottom: 20px;
+
+    color: #063f3f;
+
+    background:
+        linear-gradient(
+            90deg,
+            #a7f7d1,
+            #d4ffe9
+        );
+
+    border-radius: 30px;
+
+    font-size: 10px;
+
+    font-weight: 900;
+
+    letter-spacing: 1px;
+}
+
+
+.etiqueta::before {
+
+    content: "";
+
+    width: 8px;
+    height: 8px;
+
+    border-radius: 50%;
+
+    background: #0b9b68;
+}
+
+
+/* =====================================================
+   TÍTULO
+===================================================== */
+
+h1 {
+
+    max-width: 720px;
+
+    color: white;
+
+    font-size:
+        clamp(
+            43px,
+            5vw,
+            70px
+        );
+
+    line-height: .96;
+
+    letter-spacing: -2.8px;
+
+    font-weight: 900;
+}
+
+
+h1 span {
+
+    display: block;
+
+    color: #a8ffdc;
+}
+
+
+h1 .dengue {
+
+    color: #ffd33f;
+}
+
+
+/* =====================================================
+   LÍNEA
+===================================================== */
+
+.linea {
+
+    width: 100px;
+
+    height: 5px;
+
+    margin: 25px 0 20px;
+
+    border-radius: 10px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #52edbd,
+            #ffd33f
+        );
+}
+
+
+/* =====================================================
+   DESCRIPCIÓN
+===================================================== */
+
+.descripcion {
+
+    max-width: 610px;
+
+    color:
+        rgba(255,255,255,.82);
+
+    font-size: 15px;
+
+    line-height: 1.7;
+}
+
+
+/* =====================================================
+   INDICADORES
+===================================================== */
+
+.indicadores {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    gap: 9px;
+
+    margin-top: 26px;
+
+    max-width: 690px;
+}
+
+
+.indicador {
+
+    min-height: 72px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    padding: 10px;
+
+    background:
+        rgba(255,255,255,.10);
+
+    border:
+        1px solid
+        rgba(255,255,255,.15);
+
+    border-radius: 12px;
+
+    backdrop-filter: blur(8px);
+
+    transition: .25s ease;
+}
+
+
+.indicador:hover {
+
+    transform:
+        translateY(-5px);
+
+    background:
+        rgba(255,255,255,.16);
+}
+
+
+.icono {
+
+    width: 34px;
+    height: 34px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background:
+        rgba(160,255,220,.15);
+
+    font-size: 17px;
+}
+
+
+.indicador strong {
+
+    display: block;
+
+    color: white;
+
+    font-size: 9px;
+}
+
+
+.indicador span {
+
+    display: block;
+
+    margin-top: 3px;
+
+    color:
+        rgba(255,255,255,.58);
+
+    font-size: 8px;
+}
+
+
+/* =====================================================
+   BOTÓN
+===================================================== */
+
+.boton {
+
+    width: 360px;
+
+    min-height: 74px;
+
+    margin-top: 28px;
+
+    padding:
+        14px 18px 14px 24px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    text-decoration: none;
+
+    color: #073c3d;
+
+    background:
+        linear-gradient(
+            100deg,
+            #a9ffdc,
+            #55e5b5
+        );
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 15px 40px
+        rgba(40,230,170,.25);
+
+    transition: .3s ease;
+}
+
+
+.boton:hover {
+
+    transform:
+        translateY(-5px);
+
+    box-shadow:
+        0 20px 45px
+        rgba(40,230,170,.35);
+}
+
+
+.boton strong {
+
+    display: block;
+
+    font-size: 15px;
+
+    font-weight: 900;
+}
+
+
+.boton span {
+
+    display: block;
+
+    margin-top: 4px;
+
+    font-size: 9px;
+
+    opacity: .65;
+}
+
+
+.flecha {
+
+    width: 46px;
+    height: 46px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    color: white;
+
+    background: #087f80;
+
+    font-size: 28px;
+}
+
+
+.boton:hover .flecha {
+
+    transform:
+        translateX(7px);
+}
+
+
+/* =====================================================
+   INFORMACIÓN
+===================================================== */
+
+.informacion {
+
+    display: flex;
+
+    gap: 30px;
+
+    margin-top: 22px;
+}
+
+
+.informacion > div {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+
+.informacion strong {
+
+    color: white;
+
+    font-size: 11px;
+}
+
+
+.informacion span {
+
+    color:
+        rgba(255,255,255,.55);
+
+    font-size: 8px;
+}
+
+
+/* =====================================================
+   MOSQUITO
+===================================================== */
+
+.contenido-derecha {
+
+    height: 100%;
+
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+}
+
+
+.circulo-mosquito {
+
+    width: 440px;
+    height: 440px;
+
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: white;
+
+    border:
+        8px solid #78f0c5;
+
+    box-shadow:
+
+        0 0 0 3px
+        rgba(255,211,63,.70),
+
+        0 0 0 18px
+        rgba(255,255,255,.08),
+
+        0 30px 80px
+        rgba(0,0,0,.32);
+
+    z-index: 3;
+}
+
+
+.anillo {
+
+    position: absolute;
+
+    border-radius: 50%;
+}
+
+
+.anillo-1 {
+
+    inset: -22px;
+
+    border:
+        2px solid
+        rgba(130,255,215,.50);
+
+    animation:
+        girar 14s linear infinite;
+}
+
+
+.anillo-2 {
+
+    inset: -40px;
+
+    border:
+        2px dashed
+        rgba(255,211,63,.40);
+
+    animation:
+        girar 20s linear infinite reverse;
+}
+
+
+@keyframes girar {
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+.mosquito-real {
+
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    border-radius: 50%;
+}
+
+
+.identificacion-mosquito {
+
+    position: absolute;
+
+    left: 22px;
+    bottom: 22px;
+
+    min-width: 255px;
+
+    padding: 13px 18px;
+
+    background:
+        rgba(0,62,65,.94);
+
+    border-left:
+        4px solid #ffd33f;
+
+    border-radius: 10px;
+
+    color: white;
+}
+
+
+.identificacion-mosquito strong {
+
+    display: block;
+
+    font-size: 16px;
+
+    font-style: italic;
+}
+
+
+.identificacion-mosquito span {
+
+    display: block;
+
+    margin-top: 4px;
+
+    font-size: 10px;
+
+    opacity: .78;
+}
+
+
+/* =====================================================
+   PREVENCIÓN
+===================================================== */
+
+.prevencion {
+
+    position: absolute;
+
+    right: -10px;
+    bottom: 65px;
+
+    width: 255px;
+
+    min-height: 95px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 8px 12px;
+
+    background:
+        rgba(255,255,255,.97);
+
+    border-radius: 15px;
+
+    box-shadow:
+        0 20px 45px
+        rgba(0,0,0,.22);
+
+    z-index: 10;
+
+    animation:
+        prevencionFlota 4s ease-in-out infinite;
+}
+
+
+@keyframes prevencionFlota {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+
+.prevencion-imagen {
+
+    width: 78px;
+    height: 78px;
+
+    flex-shrink: 0;
+}
+
+
+.prevencion-imagen img {
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+}
+
+
+.prevencion-texto {
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+
+.prevencion-texto strong {
+
+    color: #174f5c;
+
+    font-size: 10px;
+}
+
+
+.prevencion-texto span {
+
+    margin-top: 4px;
+
+    color: #d92f2f;
+
+    font-size: 13px;
+
+    font-weight: 900;
+}
+
+
+/* =====================================================
+   MARCA
+===================================================== */
+
+.marca {
+
+    position: absolute;
+
+    right: 25px;
+    top: 16%;
+
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    color: white;
+
+    background:
+        rgba(255,255,255,.10);
+
+    border:
+        1px solid
+        rgba(255,255,255,.20);
+
+    font-size: 21px;
+}
+
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+footer {
+
+    height: 42px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color:
+        rgba(255,255,255,.55);
+
+    font-size: 9px;
+
+    border-top:
+        1px solid
+        rgba(255,255,255,.12);
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 900px) {
+
+    body {
+        overflow: auto;
+    }
+
+    .pagina {
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .contenido {
+        grid-template-columns: 1fr;
+        padding: 25px 0 50px;
+    }
+
+    .contenido-izquierda {
+        text-align: center;
+        margin: 20px auto;
+        padding: 30px 20px;
+    }
+
+    .etiqueta,
+    .linea {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .descripcion {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .boton {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .informacion {
+        justify-content: center;
+    }
+
+    .contenido-derecha {
+        min-height: 500px;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .identidad-texto {
+        display: none;
+    }
+
+    .logo {
+        width: 55px;
+        height: 55px;
+    }
+
+    h1 {
+        font-size: 36px;
+    }
+
+    .indicadores {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .boton {
+        width: 100%;
+    }
+
+    .informacion {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .circulo-mosquito {
+        width: 285px;
+        height: 285px;
+    }
+
+    .identificacion-mosquito {
+        min-width: 185px;
+        left: 12px;
+        bottom: 12px;
+    }
+
+    .prevencion {
+        width: 205px;
+        right: 0;
+        bottom: 20px;
+    }
+
+    .prevencion-imagen {
+        width: 60px;
+        height: 60px;
+    }
+}

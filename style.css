@@ -1,0 +1,896 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #eef3f6;
+    color: #173b59;
+    overflow-x: hidden;
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.header {
+    width: 100%;
+    height: 82px;
+
+    display: flex;
+    align-items: center;
+
+    position: relative;
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            90deg,
+            #dff3f6 0%,
+            #8fcfd9 25%,
+            #269bb0 55%,
+            #087d97 78%,
+            #07556d 100%
+        );
+
+    border-bottom: 3px solid #d7e4e8;
+}
+
+
+/* =====================================================
+   LOGO
+===================================================== */
+
+.logo-area {
+    width: 165px;
+    height: 82px;
+
+    background: #ffffff;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: relative;
+    z-index: 15;
+
+    flex-shrink: 0;
+
+    padding: 5px 25px 5px 8px;
+}
+
+
+/* punta diagonal blanca */
+
+.logo-area::after {
+    content: "";
+
+    position: absolute;
+
+    right: -35px;
+    top: 0;
+
+    width: 55px;
+    height: 82px;
+
+    background: #ffffff;
+
+    clip-path: polygon(
+        0 0,
+        45% 0,
+        100% 50%,
+        45% 100%,
+        0 100%,
+        55% 50%
+    );
+
+    z-index: -1;
+}
+
+
+/* logo real */
+
+.logo-area img {
+    width: 105px;
+    height: 68px;
+
+    object-fit: contain;
+
+    display: block;
+
+    position: relative;
+    z-index: 5;
+}
+
+
+/* =====================================================
+   TITULO CENTRAL
+===================================================== */
+
+.title-area {
+    flex: 1;
+
+    height: 82px;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    color: #ffffff;
+
+    position: relative;
+    z-index: 8;
+
+    padding: 0 220px 0 30px;
+
+    min-width: 0;
+}
+
+.title-area h1 {
+    font-size: 22px;
+
+    font-weight: 800;
+
+    line-height: 1.1;
+
+    white-space: nowrap;
+
+    text-shadow:
+        0 2px 3px rgba(0, 0, 0, .28);
+}
+
+.title-area p {
+    font-size: 11px;
+
+    margin-top: 5px;
+
+    white-space: nowrap;
+
+    color: #f4fbfd;
+
+    text-shadow:
+        0 1px 2px rgba(0, 0, 0, .25);
+}
+
+
+/* =====================================================
+   MOSQUITO
+===================================================== */
+
+.mosquito-area {
+    position: absolute;
+
+    right: 145px;
+    top: 0;
+
+    width: 215px;
+    height: 82px;
+
+    overflow: hidden;
+
+    z-index: 4;
+
+    clip-path: polygon(
+        8% 0,
+        100% 0,
+        100% 100%,
+        8% 100%,
+        0 50%
+    );
+}
+
+
+/* imagen */
+
+.mosquito-area img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+
+    object-position: center center;
+
+    filter: brightness(.78) saturate(.9);
+}
+
+
+/* degradado para integrar mosquito */
+
+.mosquito-area::after {
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(7, 125, 151, .55),
+            rgba(7, 125, 151, 0) 35%,
+            rgba(7, 125, 151, .05) 100%
+        );
+
+    pointer-events: none;
+}
+
+
+/* =====================================================
+   ACTUALIZACIÓN
+===================================================== */
+
+.update-box {
+    position: absolute;
+
+    right: 9px;
+    top: 8px;
+
+    width: 145px;
+    height: 66px;
+
+    background: rgba(3, 62, 82, .96);
+
+    color: white;
+
+    border-radius: 10px;
+
+    padding: 7px 9px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+
+    z-index: 20;
+
+    box-shadow:
+        0 2px 7px rgba(0, 0, 0, .18);
+}
+
+.calendar-icon {
+    font-size: 20px;
+
+    flex-shrink: 0;
+}
+
+.update-content {
+    min-width: 0;
+}
+
+.update-box strong,
+.update-box span,
+.update-box small {
+    display: block;
+}
+
+.update-box strong {
+    font-size: 8px;
+
+    white-space: nowrap;
+}
+
+.update-box span {
+    font-size: 12px;
+
+    font-weight: 800;
+
+    line-height: 1.2;
+}
+
+.update-box small {
+    font-size: 8px;
+
+    margin-top: 2px;
+}
+
+
+/* =====================================================
+   FILTROS
+===================================================== */
+
+.filters {
+    margin: 7px 8px;
+
+    padding: 9px 10px;
+
+    background: white;
+
+    border-radius: 11px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(6, 1fr);
+
+    gap: 10px;
+
+    box-shadow:
+        0 2px 7px rgba(0, 0, 0, .07);
+}
+
+.filter label {
+    display: block;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    margin-bottom: 4px;
+
+    color: #164563;
+}
+
+.filter select {
+    width: 100%;
+
+    height: 32px;
+
+    padding: 4px 9px;
+
+    border: 1px solid #cbd8df;
+
+    border-radius: 7px;
+
+    background: white;
+
+    color: #244d66;
+
+    font-size: 11px;
+
+    outline: none;
+}
+
+.filter select:focus {
+    border-color: #078ba6;
+
+    box-shadow:
+        0 0 0 2px rgba(7, 139, 166, .10);
+}
+
+
+/* =====================================================
+   TARJETAS
+===================================================== */
+
+.cards {
+    display: grid;
+
+    grid-template-columns:
+        repeat(6, 1fr);
+
+    gap: 8px;
+
+    padding: 0 8px;
+}
+
+.card {
+    background: white;
+
+    border-radius: 10px;
+
+    padding: 11px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    min-height: 96px;
+
+    box-shadow:
+        0 2px 7px rgba(0, 0, 0, .08);
+
+    border: 1px solid #e0e9ed;
+}
+
+.card-icon {
+    width: 43px;
+    min-width: 43px;
+
+    height: 43px;
+
+    border-radius: 8px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 21px;
+}
+
+.card h3 {
+    font-size: 11px;
+
+    color: #164563;
+}
+
+.card strong {
+    display: block;
+
+    font-size: 21px;
+
+    margin-top: 4px;
+
+    color: #123f5e;
+}
+
+.card p {
+    margin-top: 3px;
+
+    font-weight: bold;
+
+    font-size: 10px;
+}
+
+.card small {
+    color: #777;
+
+    font-size: 8px;
+}
+
+.up {
+    color: #2ca84a;
+}
+
+.down {
+    color: #e53935;
+}
+
+.cyan .card-icon {
+    background: #08a7b9;
+}
+
+.red .card-icon {
+    background: #ed3c45;
+}
+
+.yellow .card-icon {
+    background: #f2aa12;
+}
+
+.purple .card-icon {
+    background: #7437a5;
+}
+
+.green .card-icon {
+    background: #38aa43;
+}
+
+.blue .card-icon {
+    background: #0877c9;
+}
+
+
+/* =====================================================
+   GRID
+===================================================== */
+
+.dashboard-grid {
+    display: grid;
+
+    grid-template-columns:
+        1.05fr 1.05fr 1fr;
+
+    gap: 8px;
+
+    margin: 8px 8px;
+}
+
+.panel {
+    background: white;
+
+    border-radius: 10px;
+
+    padding: 9px;
+
+    min-height: 255px;
+
+    box-shadow:
+        0 2px 7px rgba(0, 0, 0, .08);
+
+    overflow: hidden;
+
+    border: 1px solid #e0e9ed;
+}
+
+.panel-title {
+    background: #078ca5;
+
+    color: white;
+
+    font-weight: bold;
+
+    font-size: 12px;
+
+    padding: 7px 10px;
+
+    margin: -9px -9px 9px;
+
+    border-radius: 10px 10px 0 0;
+
+    min-height: 30px;
+
+    display: flex;
+
+    align-items: center;
+}
+
+
+/* =====================================================
+   GRAFICOS
+===================================================== */
+
+.chart-container {
+    width: 100%;
+
+    height: 215px;
+
+    position: relative;
+}
+
+.chart-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+
+/* =====================================================
+   COBERTURA
+===================================================== */
+
+.coverage {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 18px;
+
+    height: 215px;
+}
+
+.donut {
+    width: 175px;
+    height: 175px;
+
+    position: relative;
+
+    flex-shrink: 0;
+}
+
+.donut canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.donut-text {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    text-align: center;
+
+    width: 120px;
+}
+
+.donut-text strong {
+    display: block;
+
+    font-size: 27px;
+
+    color: #087d9c;
+}
+
+.donut-text span {
+    font-weight: bold;
+
+    font-size: 11px;
+}
+
+.coverage-info {
+    width: 190px;
+}
+
+.coverage-info > div {
+    background: #f1f7f9;
+
+    padding: 8px;
+
+    margin-bottom: 6px;
+
+    border-radius: 7px;
+}
+
+.coverage-info strong {
+    display: block;
+
+    font-size: 14px;
+}
+
+.coverage-info span {
+    font-size: 9px;
+}
+
+.progress {
+    background: #dce6eb;
+
+    height: 9px;
+
+    border-radius: 10px;
+
+    margin-top: 6px;
+
+    overflow: hidden;
+}
+
+.progress div {
+    background: #0798ad;
+
+    height: 100%;
+
+    border-radius: 10px;
+}
+
+
+/* =====================================================
+   MAPA
+===================================================== */
+
+#map {
+    width: 100%;
+
+    height: 215px;
+
+    border-radius: 7px;
+
+    overflow: hidden;
+}
+
+
+/* =====================================================
+   TABLA
+===================================================== */
+
+.table-panel {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    font-size: 9px;
+}
+
+th {
+    background: #e7f0f4;
+
+    color: #164563;
+
+    padding: 6px 4px;
+
+    white-space: nowrap;
+}
+
+td {
+    padding: 6px 4px;
+
+    border-bottom:
+        1px solid #ddd;
+
+    text-align: center;
+}
+
+td:first-child {
+    text-align: left;
+
+    font-weight: bold;
+}
+
+
+/* =====================================================
+   FILAS
+===================================================== */
+
+.second {
+    grid-template-columns:
+        1.35fr 1fr 1fr;
+}
+
+.third {
+    grid-template-columns:
+        1fr 1fr 1.8fr;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media(max-width:1200px) {
+
+    .title-area {
+        padding-right: 200px;
+    }
+
+    .mosquito-area {
+        right: 140px;
+        width: 190px;
+    }
+
+    .cards {
+        grid-template-columns:
+            repeat(3, 1fr);
+    }
+
+    .filters {
+        grid-template-columns:
+            repeat(3, 1fr);
+    }
+
+    .dashboard-grid,
+    .second,
+    .third {
+        grid-template-columns:
+            1fr 1fr;
+    }
+}
+
+
+@media(max-width:800px) {
+
+    .header {
+        height: 82px;
+    }
+
+    .logo-area {
+        width: 120px;
+        padding: 5px 18px 5px 5px;
+    }
+
+    .logo-area img {
+        width: 82px;
+        height: 62px;
+    }
+
+    .title-area {
+        padding: 0 150px 0 10px;
+    }
+
+    .title-area h1 {
+        font-size: 16px;
+    }
+
+    .title-area p {
+        font-size: 9px;
+    }
+
+    .mosquito-area {
+        width: 145px;
+        right: 130px;
+    }
+
+    .update-box {
+        width: 125px;
+        right: 5px;
+    }
+
+    .calendar-icon {
+        font-size: 16px;
+    }
+
+    .update-box strong {
+        font-size: 7px;
+    }
+
+    .update-box span {
+        font-size: 10px;
+    }
+
+    .update-box small {
+        font-size: 7px;
+    }
+
+    .cards {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .filters {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .dashboard-grid,
+    .second,
+    .third {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media(max-width:600px) {
+
+    .header {
+        height: 82px;
+    }
+
+    .logo-area {
+        width: 85px;
+    }
+
+    .logo-area img {
+        width: 65px;
+        height: 55px;
+    }
+
+    .title-area {
+        padding: 0 105px 0 5px;
+    }
+
+    .title-area h1 {
+        font-size: 12px;
+    }
+
+    .title-area p {
+        font-size: 7px;
+
+        white-space: normal;
+    }
+
+    .mosquito-area {
+        right: 105px;
+
+        width: 95px;
+    }
+
+    .update-box {
+        width: 100px;
+        height: 62px;
+    }
+
+    .calendar-icon {
+        display: none;
+    }
+
+    .cards,
+    .filters {
+        grid-template-columns: 1fr;
+    }
+
+    .coverage {
+        gap: 8px;
+    }
+
+    .donut {
+        width: 145px;
+        height: 145px;
+    }
+
+    .coverage-info {
+        width: 155px;
+    }
+}
