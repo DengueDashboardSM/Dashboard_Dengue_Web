@@ -392,15 +392,12 @@ function actualizarFecha() {
 
     }
 
-    if (horaElemento) {
+   if (horaElemento) {
 
-        horaElemento.innerHTML =
-            `🕐 <strong>09:59 a. m.</strong><br>
-             <span style="font-size:10px;">
-             Datos Reales y Registrados
-             </span>`;
+    horaElemento.innerHTML =
+        `🕐 <strong>09:59 a. m.</strong>`;
 
-    }
+}
 
 }
 
