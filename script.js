@@ -1325,20 +1325,56 @@ function actualizarSector() {
 
 function actualizarInspector() {
 
-    const o =
-        agruparInspeccionadas(
-            "nombre_inspector",
-            "Sin inspector"
+    const conteoInspectores = {};
+
+    datosFiltrados
+        .filter(inspeccionada)
+        .forEach(
+            fila => {
+
+                const inspector =
+                    texto(
+                        fila.nombre_inspector
+                    ) || "Sin inspector";
+
+                conteoInspectores[inspector] =
+                    (
+                        conteoInspectores[inspector] || 0
+                    ) + 1;
+
+            }
         );
+
+
+    const ranking =
+        Object.entries(
+            conteoInspectores
+        )
+        .sort(
+            (a, b) =>
+                b[1] - a[1]
+        )
+        .slice(0, 10);
+
 
     graficoBarras(
         "inspectorChart",
-        o.map(x => x[0]),
-        o.map(x => x[1]),
-        "Viviendas",
+
+        ranking.map(
+            x => x[0]
+        ),
+
+        ranking.map(
+            x => x[1]
+        ),
+
+        "Viviendas inspeccionadas",
+
         "#75bce7",
+
         true
     );
+
 }
 
 function actualizarLocalidad() {
