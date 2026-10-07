@@ -311,58 +311,192 @@ function fijarTextoFecha(
 function actualizarFecha() {
 
     const fechas =
+
         datosOriginales
+
             .map(
+
                 f =>
+
                     obtenerFecha(
+
                         f.fecha_inspeccion
+
                     )
+
             )
+
             .filter(Boolean);
+
 
     if (fechas.length === 0) {
 
         fijarTextoFecha(
+
             "Sin fecha",
+
             "Datos Reales y Registrados"
+
         );
 
         return;
+
     }
 
+
     let max =
+
         fechas[0].getTime();
 
+
     fechas.forEach(
+
         f => {
 
             if (
+
                 f.getTime() >
+
                 max
+
             ) {
+
                 max =
+
                     f.getTime();
+
             }
+
         }
+
     );
+
 
     const u =
+
         new Date(max);
 
+
     const dia =
+
         String(
+
             u.getDate()
-        ).padStart(2, "0");
+
+        ).padStart(
+
+            2,
+
+            "0"
+
+        );
+
 
     const mes =
+
         String(
+
             u.getMonth() + 1
-        ).padStart(2, "0");
+
+        ).padStart(
+
+            2,
+
+            "0"
+
+        );
+
+
+    const hora =
+
+        String(
+
+            u.getHours()
+
+        ).padStart(
+
+            2,
+
+            "0"
+
+        );
+
+
+    const minutos =
+
+        String(
+
+            u.getMinutes()
+
+        ).padStart(
+
+            2,
+
+            "0"
+
+        );
+
+
+    const segundos =
+
+        String(
+
+            u.getSeconds()
+
+        ).padStart(
+
+            2,
+
+            "0"
+
+        );
+
+
+    const hora12 =
+
+        u.getHours() % 12 || 12;
+
+
+    const periodo =
+
+        u.getHours() >= 12
+
+            ? "p. m."
+
+            : "a. m.";
+
+
+    const horaMostrar =
+
+        String(hora12).padStart(
+
+            2,
+
+            "0"
+
+        ) +
+
+        ":" +
+
+        minutos +
+
+        ":" +
+
+        segundos +
+
+        " " +
+
+        periodo;
+
 
     fijarTextoFecha(
+
         `${dia}/${mes}/${u.getFullYear()}`,
-        "Datos Reales y Registrados"
+
+        `🕐 ${horaMostrar}<br><span style="font-size:10px;">Datos Reales y Registrados</span>`
+
     );
+
 }
 
 // ============================================================
