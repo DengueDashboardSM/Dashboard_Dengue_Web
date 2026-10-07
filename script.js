@@ -311,191 +311,96 @@ function fijarTextoFecha(
 function actualizarFecha() {
 
     const fechas =
-
         datosOriginales
-
             .map(
-
                 f =>
-
                     obtenerFecha(
-
                         f.fecha_inspeccion
-
                     )
-
             )
-
             .filter(Boolean);
-
 
     if (fechas.length === 0) {
 
-        fijarTextoFecha(
+        const fechaElemento =
+            document.getElementById(
+                "fechaActualizacion"
+            );
 
-            "Sin fecha",
+        const horaElemento =
+            document.getElementById(
+                "horaActualizacion"
+            );
 
-            "Datos Reales y Registrados"
+        if (fechaElemento) {
+            fechaElemento.textContent = "Sin fecha";
+        }
 
-        );
+        if (horaElemento) {
+            horaElemento.innerHTML =
+                "Datos Reales y Registrados";
+        }
 
         return;
-
     }
 
-
     let max =
-
         fechas[0].getTime();
 
-
     fechas.forEach(
-
         f => {
 
             if (
-
-                f.getTime() >
-
-                max
-
+                f.getTime() > max
             ) {
-
-                max =
-
-                    f.getTime();
-
+                max = f.getTime();
             }
 
         }
-
     );
-
 
     const u =
-
         new Date(max);
 
-
     const dia =
-
         String(
-
             u.getDate()
-
-        ).padStart(
-
-            2,
-
-            "0"
-
-        );
-
+        ).padStart(2, "0");
 
     const mes =
-
         String(
-
             u.getMonth() + 1
+        ).padStart(2, "0");
 
-        ).padStart(
+    const año =
+        u.getFullYear();
 
-            2,
-
-            "0"
-
+    const fechaElemento =
+        document.getElementById(
+            "fechaActualizacion"
         );
 
-
-    const hora =
-
-        String(
-
-            u.getHours()
-
-        ).padStart(
-
-            2,
-
-            "0"
-
+    const horaElemento =
+        document.getElementById(
+            "horaActualizacion"
         );
 
+    if (fechaElemento) {
 
-    const minutos =
+        fechaElemento.textContent =
+            `${dia}/${mes}/${año}`;
 
-        String(
+    }
 
-            u.getMinutes()
+    if (horaElemento) {
 
-        ).padStart(
+        horaElemento.innerHTML =
+            `🕐 <strong>09:59 a. m.</strong><br>
+             <span style="font-size:10px;">
+             Datos Reales y Registrados
+             </span>`;
 
-            2,
-
-            "0"
-
-        );
-
-
-    const segundos =
-
-        String(
-
-            u.getSeconds()
-
-        ).padStart(
-
-            2,
-
-            "0"
-
-        );
-
-
-    const hora12 =
-
-        u.getHours() % 12 || 12;
-
-
-    const periodo =
-
-        u.getHours() >= 12
-
-            ? "p. m."
-
-            : "a. m.";
-
-
-    const horaMostrar =
-
-        String(hora12).padStart(
-
-            2,
-
-            "0"
-
-        ) +
-
-        ":" +
-
-        minutos +
-
-        ":" +
-
-        segundos +
-
-        " " +
-
-        periodo;
-
-
-    fijarTextoFecha(
-
-        `${dia}/${mes}/${u.getFullYear()}`,
-
-        `🕐 ${horaMostrar}<br><span style="font-size:10px;">Datos Reales y Registrados</span>`
-
-    );
+    }
 
 }
 
