@@ -5,11 +5,15 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-    <title>Dashboard de Inspecciones y Control de Dengue</title>
+    <title>
+        Dashboard de Inspecciones y Control de Dengue
+    </title>
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet"
+          href="style.css">
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -17,7 +21,7 @@
     <!-- Papa Parse -->
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
-    <!-- SheetJS - Excel -->
+    <!-- SheetJS -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <!-- Leaflet -->
@@ -38,10 +42,12 @@
 
 <header class="header">
 
+
     <div class="logo-area">
 
-        <img src="img/logo.png"
-             alt="Dirección Regional de Salud San Martín">
+        <img
+            src="img/logo.png"
+            alt="Dirección Regional de Salud San Martín">
 
     </div>
 
@@ -61,8 +67,9 @@
 
     <div class="mosquito-area">
 
-        <img src="img/mosquito.png"
-             alt="Mosquito Aedes aegypti">
+        <img
+            src="img/mosquito.png"
+            alt="Mosquito Aedes aegypti">
 
     </div>
 
@@ -91,6 +98,7 @@
 
     </div>
 
+
 </header>
 
 
@@ -102,9 +110,13 @@
 <section class="filters">
 
 
+    <!-- LOCALIDAD -->
+
     <div class="filter">
 
-        <label>📍 Localidad</label>
+        <label>
+            📍 Localidad
+        </label>
 
         <select id="filtroLocalidad">
 
@@ -117,10 +129,13 @@
     </div>
 
 
+    <!-- MES -->
 
     <div class="filter">
 
-        <label>📅 Mes</label>
+        <label>
+            📅 Mes
+        </label>
 
         <select id="filtroMes">
 
@@ -133,10 +148,13 @@
     </div>
 
 
+    <!-- INSPECTOR -->
 
     <div class="filter">
 
-        <label>👤 Inspector</label>
+        <label>
+            👤 Inspector
+        </label>
 
         <select id="filtroInspector">
 
@@ -146,7 +164,6 @@
 
         </select>
 
-        <!-- BUSCADOR DE INSPECTOR -->
 
         <input
             type="text"
@@ -163,6 +180,7 @@
                 outline:none;
             ">
 
+
         <button
             id="btnBuscarInspector"
             type="button"
@@ -177,16 +195,21 @@
                 font-weight:bold;
                 cursor:pointer;
             ">
+
             🔎 Buscar
+
         </button>
 
     </div>
 
 
+    <!-- SECTOR -->
 
     <div class="filter">
 
-        <label>🗺️ Sector</label>
+        <label>
+            🗺️ Sector
+        </label>
 
         <select id="filtroSector">
 
@@ -199,10 +222,13 @@
     </div>
 
 
+    <!-- TIPO -->
 
     <div class="filter">
 
-        <label>📋 Tipo de inspección</label>
+        <label>
+            📋 Tipo de inspección
+        </label>
 
         <select id="filtroTipo">
 
@@ -215,10 +241,13 @@
     </div>
 
 
+    <!-- MANZANA -->
 
     <div class="filter">
 
-        <label>🏘️ Código de manzana</label>
+        <label>
+            🏘️ Código de manzana
+        </label>
 
         <select id="filtroManzana">
 
@@ -243,6 +272,7 @@
         margin-top:2px;
     ">
 
+
         <button
             id="btnExcelLocalidad"
             type="button"
@@ -256,7 +286,9 @@
                 font-weight:bold;
                 cursor:pointer;
             ">
+
             📥 Descargar detalles por localidad
+
         </button>
 
 
@@ -273,7 +305,9 @@
                 font-weight:bold;
                 cursor:pointer;
             ">
+
             📥 Descargar viviendas por inspector
+
         </button>
 
 
@@ -290,10 +324,14 @@
                 font-weight:bold;
                 cursor:pointer;
             ">
+
             📥 Descargar direcciones
+
         </button>
 
+
     </div>
+
 
 </section>
 
@@ -305,6 +343,8 @@
 
 <section class="cards">
 
+
+    <!-- INSPECCIONADAS -->
 
     <div class="card cyan">
 
@@ -335,6 +375,7 @@
     </div>
 
 
+    <!-- CERRADAS -->
 
     <div class="card red">
 
@@ -365,6 +406,7 @@
     </div>
 
 
+    <!-- RENUENTES -->
 
     <div class="card yellow">
 
@@ -395,6 +437,7 @@
     </div>
 
 
+    <!-- DESHABITADAS -->
 
     <div class="card purple">
 
@@ -425,6 +468,7 @@
     </div>
 
 
+    <!-- RECUPERADAS -->
 
     <div class="card green">
 
@@ -455,6 +499,7 @@
     </div>
 
 
+    <!-- INSPECTORES -->
 
     <div class="card blue">
 
@@ -480,12 +525,13 @@
 
     </div>
 
+
 </section>
 
 
 
 <!-- =====================================================
-     PRIMERA FILA
+     PRIMERA FILA DE GRÁFICOS
 ====================================================== -->
 
 <section class="dashboard-grid">
@@ -499,7 +545,9 @@
             📍 Cobertura de inspección
         </div>
 
+
         <div class="coverage">
+
 
             <div class="donut">
 
@@ -522,6 +570,7 @@
 
 
             <div class="coverage-info">
+
 
                 <div>
 
@@ -572,6 +621,7 @@
 
                 </div>
 
+
             </div>
 
         </div>
@@ -614,6 +664,7 @@
 
     </div>
 
+
 </section>
 
 
@@ -624,6 +675,8 @@
 
 <section class="dashboard-grid second">
 
+
+    <!-- POR MES -->
 
     <div class="panel">
 
@@ -641,6 +694,8 @@
 
 
 
+    <!-- MAPA -->
+
     <div class="panel">
 
         <div class="panel-title">
@@ -652,6 +707,8 @@
     </div>
 
 
+
+    <!-- SECTOR -->
 
     <div class="panel">
 
@@ -667,6 +724,7 @@
 
     </div>
 
+
 </section>
 
 
@@ -677,6 +735,8 @@
 
 <section class="dashboard-grid third">
 
+
+    <!-- INSPECTOR -->
 
     <div class="panel">
 
@@ -694,6 +754,8 @@
 
 
 
+    <!-- LOCALIDAD -->
+
     <div class="panel">
 
         <div class="panel-title">
@@ -710,11 +772,14 @@
 
 
 
+    <!-- TABLA -->
+
     <div class="panel table-panel">
 
         <div class="panel-title">
             📋 Detalle por localidad
         </div>
+
 
         <table>
 
@@ -722,21 +787,34 @@
 
                 <tr>
 
-                    <th>Localidad</th>
+                    <th>
+                        Localidad
+                    </th>
 
-                    <th>Inspeccionadas</th>
+                    <th>
+                        Inspeccionadas
+                    </th>
 
-                    <th>Cerradas</th>
+                    <th>
+                        Cerradas
+                    </th>
 
-                    <th>Renuentes</th>
+                    <th>
+                        Renuentes
+                    </th>
 
-                    <th>Deshabitadas</th>
+                    <th>
+                        Deshabitadas
+                    </th>
 
-                    <th>Recuperadas</th>
+                    <th>
+                        Recuperadas
+                    </th>
 
                 </tr>
 
             </thead>
+
 
             <tbody id="tablaLocalidades">
 
@@ -746,11 +824,17 @@
 
     </div>
 
+
 </section>
 
 
 
+<!-- =====================================================
+     JAVASCRIPT
+====================================================== -->
+
 <script src="script.js"></script>
+
 
 </body>
 
