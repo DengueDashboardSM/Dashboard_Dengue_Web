@@ -1,12 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard de Inspecciones y Control de Dengue</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Papa Parse -->
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+    <!-- SheetJS - Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+    <!-- Leaflet -->
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     HEADER
+====================================================== -->
+
+<header class="header">
+
+    <div class="logo-area">
+
+        <img src="img/logo.png"
+             alt="Dirección Regional de Salud San Martín">
+
+    </div>
+
+
+    <div class="title-area">
+
+        <h1>
+            DASHBOARD DE INSPECCIONES Y CONTROL DE DENGUE
+        </h1>
+
+        <p>
+            Seguimiento de viviendas, criaderos e intervenciones de control vectorial
+        </p>
+
+    </div>
+
+
+    <div class="mosquito-area">
+
+        <img src="img/mosquito.png"
+             alt="Mosquito Aedes aegypti">
+
+    </div>
+
+
+    <div class="update-box">
+
+        <div class="calendar-icon">
+            📅
+        </div>
+
+        <div class="update-content">
+
+            <strong>
+                Última actualización
+            </strong>
+
+            <span id="fechaActualizacion">
+                Cargando...
+            </span>
+
+            <small id="horaActualizacion">
+                Datos Reales y Registrados
+            </small>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+
+<!-- =====================================================
+     FILTROS
+====================================================== -->
+
+<section class="filters">
+
+
+    <div class="filter">
+
+        <label>📍 Localidad</label>
+
+        <select id="filtroLocalidad">
+
+            <option value="Todas">
+                Todas
+            </option>
+
+        </select>
+
+    </div>
+
+
+
+    <div class="filter">
+
+        <label>📅 Mes</label>
+
+        <select id="filtroMes">
+
+            <option value="Todos">
+                Todos
+            </option>
+
+        </select>
+
+    </div>
+
+
+
+    <div class="filter">
+
+        <label>👤 Inspector</label>
+
+        <select id="filtroInspector">
+
+            <option value="Todos">
+                Todos
+            </option>
+
+        </select>
+
+        <!-- BUSCADOR DE INSPECTOR -->
+
+        <input
+            type="text"
+            id="busquedaInspector"
+            placeholder="🔎 Buscar inspector..."
+            style="
+                width:100%;
+                height:30px;
+                margin-top:5px;
+                padding:5px 8px;
+                border:1px solid #cbd8df;
+                border-radius:7px;
+                font-size:10px;
+                outline:none;
+            ">
+
+        <button
+            id="btnBuscarInspector"
+            type="button"
+            style="
+                margin-top:5px;
+                background:#078ca5;
+                color:white;
+                border:none;
+                border-radius:6px;
+                padding:6px 12px;
+                font-size:10px;
+                font-weight:bold;
+                cursor:pointer;
+            ">
+            🔎 Buscar
+        </button>
+
+    </div>
+
+
+
+    <div class="filter">
+
+        <label>🗺️ Sector</label>
+
+        <select id="filtroSector">
+
+            <option value="Todos">
+                Todos
+            </option>
+
+        </select>
+
+    </div>
+
+
+
+    <div class="filter">
+
+        <label>📋 Tipo de inspección</label>
+
+        <select id="filtroTipo">
+
+            <option value="Todos">
+                Todos
+            </option>
+
+        </select>
+
+    </div>
+
+
+
+    <div class="filter">
+
+        <label>🏘️ Código de manzana</label>
+
+        <select id="filtroManzana">
+
+            <option value="Todas">
+                Todas
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <!-- =================================================
+         BOTONES DE DESCARGA
+    ================================================== -->
+
+    <div style="
+        grid-column:1 / -1;
+        display:flex;
+        flex-wrap:wrap;
+        gap:7px;
+        margin-top:2px;
+    ">
+
+        <button
+            id="btnExcelLocalidad"
+            type="button"
+            style="
+                background:#078ca5;
+                color:white;
+                border:none;
+                border-radius:6px;
+                padding:7px 12px;
+                font-size:10px;
+                font-weight:bold;
+                cursor:pointer;
+            ">
+            📥 Descargar detalles por localidad
+        </button>
+
+
+        <button
+            id="btnExcelInspector"
+            type="button"
+            style="
+                background:#078ca5;
+                color:white;
+                border:none;
+                border-radius:6px;
+                padding:7px 12px;
+                font-size:10px;
+                font-weight:bold;
+                cursor:pointer;
+            ">
+            📥 Descargar viviendas por inspector
+        </button>
+
+
+        <button
+            id="btnExcelDirecciones"
+            type="button"
+            style="
+                background:#078ca5;
+                color:white;
+                border:none;
+                border-radius:6px;
+                padding:7px 12px;
+                font-size:10px;
+                font-weight:bold;
+                cursor:pointer;
+            ">
+            📥 Descargar direcciones
+        </button>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     TARJETAS
+====================================================== -->
+
 <section class="cards">
 
+
     <div class="card cyan">
+
         <div class="card-icon">
             🏠
         </div>
 
         <div class="card-data">
-            <h3>Viviendas inspeccionadas</h3>
+
+            <h3>
+                Viviendas inspeccionadas
+            </h3>
 
             <strong id="totalInspeccionadas">
                 0
@@ -19,17 +329,24 @@
             <small>
                 del CSV
             </small>
+
         </div>
+
     </div>
 
 
+
     <div class="card red">
+
         <div class="card-icon">
             🔒
         </div>
 
         <div class="card-data">
-            <h3>Viviendas cerradas</h3>
+
+            <h3>
+                Viviendas cerradas
+            </h3>
 
             <strong id="totalCerradas">
                 0
@@ -42,17 +359,24 @@
             <small>
                 del CSV
             </small>
+
         </div>
+
     </div>
 
 
+
     <div class="card yellow">
+
         <div class="card-icon">
             🚫
         </div>
 
         <div class="card-data">
-            <h3>Viviendas renuentes</h3>
+
+            <h3>
+                Viviendas renuentes
+            </h3>
 
             <strong id="totalRenuentes">
                 0
@@ -65,17 +389,24 @@
             <small>
                 del CSV
             </small>
+
         </div>
+
     </div>
 
 
+
     <div class="card purple">
+
         <div class="card-icon">
             🏚️
         </div>
 
         <div class="card-data">
-            <h3>Viviendas deshabitadas</h3>
+
+            <h3>
+                Viviendas deshabitadas
+            </h3>
 
             <strong id="totalDeshabitadas">
                 0
@@ -88,17 +419,24 @@
             <small>
                 del CSV
             </small>
+
         </div>
+
     </div>
 
 
+
     <div class="card green">
+
         <div class="card-icon">
             ♻️
         </div>
 
         <div class="card-data">
-            <h3>Viviendas recuperadas</h3>
+
+            <h3>
+                Viviendas recuperadas
+            </h3>
 
             <strong id="totalRecuperadas">
                 0
@@ -111,17 +449,24 @@
             <small>
                 del CSV
             </small>
+
         </div>
+
     </div>
 
 
+
     <div class="card blue">
+
         <div class="card-icon">
             👥
         </div>
 
         <div class="card-data">
-            <h3>Número de inspectores</h3>
+
+            <h3>
+                Número de inspectores
+            </h3>
 
             <strong id="totalInspectores">
                 0
@@ -130,7 +475,283 @@
             <small>
                 Registrados en CSV
             </small>
+
         </div>
+
     </div>
 
 </section>
+
+
+
+<!-- =====================================================
+     PRIMERA FILA
+====================================================== -->
+
+<section class="dashboard-grid">
+
+
+    <!-- COBERTURA -->
+
+    <div class="panel">
+
+        <div class="panel-title">
+            📍 Cobertura de inspección
+        </div>
+
+        <div class="coverage">
+
+            <div class="donut">
+
+                <canvas id="coverageChart"></canvas>
+
+                <div class="donut-text">
+
+                    <strong id="coveragePercent">
+                        0%
+                    </strong>
+
+                    <span>
+                        Cobertura<br>
+                        de inspección
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="coverage-info">
+
+                <div>
+
+                    🏠
+
+                    <strong id="coverageInspeccionadas">
+                        0
+                    </strong>
+
+                    <span>
+                        Viviendas inspeccionadas
+                    </span>
+
+                </div>
+
+
+                <div>
+
+                    🏠
+
+                    <strong id="coverageTotal">
+                        0
+                    </strong>
+
+                    <span>
+                        Total viviendas base
+                    </span>
+
+                </div>
+
+
+                <div>
+
+                    🎯
+
+                    <strong>
+                        Meta anual: 80%
+                    </strong>
+
+                    <div class="progress">
+
+                        <div
+                            id="coverageProgress"
+                            style="width:0%">
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- CONDICIÓN -->
+
+    <div class="panel">
+
+        <div class="panel-title">
+            📊 Viviendas por condición
+        </div>
+
+        <div class="chart-container">
+
+            <canvas id="conditionChart"></canvas>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- RANKING -->
+
+    <div class="panel">
+
+        <div class="panel-title">
+            🏆 Ranking TOP 10 de tipos de criadero
+        </div>
+
+        <div class="chart-container">
+
+            <canvas id="rankingChart"></canvas>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     SEGUNDA FILA
+====================================================== -->
+
+<section class="dashboard-grid second">
+
+
+    <div class="panel">
+
+        <div class="panel-title">
+            📈 Viviendas inspeccionadas por mes
+        </div>
+
+        <div class="chart-container">
+
+            <canvas id="monthlyChart"></canvas>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="panel">
+
+        <div class="panel-title">
+            🗺️ Viviendas inspeccionadas por localidad
+        </div>
+
+        <div id="map"></div>
+
+    </div>
+
+
+
+    <div class="panel">
+
+        <div class="panel-title">
+            📊 Por sector
+        </div>
+
+        <div class="chart-container">
+
+            <canvas id="sectorChart"></canvas>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     TERCERA FILA
+====================================================== -->
+
+<section class="dashboard-grid third">
+
+
+    <div class="panel">
+
+        <div class="panel-title">
+            👤 Viviendas inspeccionadas por inspector
+        </div>
+
+        <div class="chart-container">
+
+            <canvas id="inspectorChart"></canvas>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="panel">
+
+        <div class="panel-title">
+            📍 Viviendas inspeccionadas por localidad
+        </div>
+
+        <div class="chart-container">
+
+            <canvas id="localityChart"></canvas>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="panel table-panel">
+
+        <div class="panel-title">
+            📋 Detalle por localidad
+        </div>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Localidad</th>
+
+                    <th>Inspeccionadas</th>
+
+                    <th>Cerradas</th>
+
+                    <th>Renuentes</th>
+
+                    <th>Deshabitadas</th>
+
+                    <th>Recuperadas</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="tablaLocalidades">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+
+
+<script src="script.js"></script>
+
+</body>
+
+</html>
