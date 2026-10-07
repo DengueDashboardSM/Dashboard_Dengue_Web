@@ -395,7 +395,7 @@ function actualizarFecha() {
    if (horaElemento) {
 
     horaElemento.innerHTML =
-        `🕐 <strong>09:59 a. m.</strong>`;
+        `Hora de actualizacion <strong>09:59 a. m.</strong>`;
 
 }
 
