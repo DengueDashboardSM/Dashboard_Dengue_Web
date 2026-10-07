@@ -1353,8 +1353,7 @@ function actualizarInspector() {
         .sort(
             (a, b) =>
                 b[1] - a[1]
-        )
-        .slice(0, 10);
+        );
 
 
     graficoBarras(
