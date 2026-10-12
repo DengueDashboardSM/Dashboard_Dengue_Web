@@ -157,10 +157,10 @@ function estadoVivienda(f) {
     return "INSPECCIONADA";
 }
 
-// ============================================================
-// FECHA
-// ============================================================
 
+ // ============================================================
+ // FECHA
+ // ============================================================
 
 function obtenerFecha(valor) {
     valor = texto(valor);
@@ -170,23 +170,40 @@ function obtenerFecha(valor) {
     let fecha = null;
     let m;
 
-    // Formato DD/MM/AAAA, DD-MM-AAAA o DD.MM.AAAA
-    if ((m = valor.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/))) {
-        fecha = new Date(
-            Number(m[3]),
-            Number(m[2]) - 1,
-            Number(m[1])
-        );
-    }
-    // Formato AAAA/MM/DD, AAAA-MM-DD o AAAA.MM.DD
-    else if ((m = valor.match(/^(\d{4})[\/.-](\d{1,2})[\/.-](\d{1,2})$/))) {
-        fecha = new Date(
-            Number(m[1]),
-            Number(m[2]) - 1,
-            Number(m[3])
-        );
-    }
-    else {
+    // Formato día/mes/año: 01/09/2026 o 01-09-2026
+    if ((m = valor.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})/))) {
+        const dia = Number(m[1]);
+        const mes = Number(m[2]);
+        const anio = Number(m[3]);
+
+        fecha = new Date(anio, mes - 1, dia);
+
+        // Evitar fechas inválidas, como 31/02/2026
+        if (
+            fecha.getFullYear() !== anio ||
+            fecha.getMonth() !== mes - 1 ||
+            fecha.getDate() !== dia
+        ) {
+            return null;
+        }
+
+    // Formato año/mes/día: 2026-09-01
+    } else if ((m = valor.match(/^(\d{4})[\/.-](\d{1,2})[\/.-](\d{1,2})/))) {
+        const anio = Number(m[1]);
+        const mes = Number(m[2]);
+        const dia = Number(m[3]);
+
+        fecha = new Date(anio, mes - 1, dia);
+
+        if (
+            fecha.getFullYear() !== anio ||
+            fecha.getMonth() !== mes - 1 ||
+            fecha.getDate() !== dia
+        ) {
+            return null;
+        }
+
+    } else {
         fecha = new Date(valor);
     }
 
@@ -199,13 +216,28 @@ function fijarTextoFecha(principal, secundario) {
 }
 
 async function actualizarFecha() {
-    // Fecha y hora fijas de la última actualización del CSV.
-    fijarTextoFecha(
-        "12/10/2026",
-        "Hora de actualización: 08:06 a. m."
-    );
-}
+    try {
+        const respuesta = await fetch(
+            "./actualizacion.json?v=" + Date.now(),
+            { cache: "no-store" }
+        );
 
+        if (!respuesta.ok) {
+            throw new Error("No se pudo leer actualizacion.json");
+        }
+
+        const datos = await respuesta.json();
+
+        fijarTextoFecha(
+            datos.fecha || "Sin fecha",
+            "Hora de actualización: " + (datos.hora || "Sin hora")
+        );
+
+    } catch (error) {
+        console.error("Error leyendo fecha de actualización:", error);
+        fijarTextoFecha("Sin registro", "Actualización no disponible");
+    }
+}
 
 // ============================================================
 // FILTROS
