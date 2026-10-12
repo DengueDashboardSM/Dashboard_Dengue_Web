@@ -644,26 +644,150 @@ function actualizarSector() {
     );
 }
 
+
 function actualizarInspector() {
+    configurarLimiteGraficoInspector();
+
+    const canvas = document.getElementById("inspectorChart");
+    if (!canvas || typeof Chart === "undefined") return;
 
     const conteoInspectores = {};
 
+    // Contar los datos reales que ya pasaron por los filtros.
     datosFiltrados.filter(inspeccionada).forEach(fila => {
         const inspector = texto(fila.nombre_inspector) || "Sin inspector";
-        conteoInspectores[inspector] = (conteoInspectores[inspector] || 0) + 1;
+        conteoInspectores[inspector] =
+            (conteoInspectores[inspector] || 0) + 1;
     });
 
-    const ranking = Object.entries(conteoInspectores).sort((a, b) => b[1] - a[1]);
+    // Orden descendente por cantidad de viviendas.
+    const rankingCompleto = Object.entries(conteoInspectores)
+        .sort((a, b) => b[1] - a[1] ||
+            a[0].localeCompare(b[0], "es"));
 
-    graficoBarras(
-        "inspectorChart",
-        ranking.map(x => x[0]),
-        ranking.map(x => x[1]),
-        "Viviendas inspeccionadas",
-        "#75bce7",
-        true
-    );
+    // Top 10, Top 15 o todos.
+    const selector = document.getElementById("inspectorChartLimit");
+    const limite = selector ? selector.value : "all";
+
+    const ranking = limite === "all"
+        ? rankingCompleto
+        : rankingCompleto.slice(0, Number(limite));
+
+    const alturaFila = 30;
+    const alturaGrafico = Math.max(220, ranking.length * alturaFila + 36);
+    const alturaVisible = 460;
+
+    const contenedor = canvas.closest(".inspector-chart-scroll");
+    const interior = canvas.parentElement;
+
+    if (contenedor && interior) {
+        contenedor.style.height =
+            Math.min(alturaGrafico, alturaVisible) + "px";
+
+        contenedor.style.maxHeight = alturaVisible + "px";
+        contenedor.style.overflowY =
+            alturaGrafico > alturaVisible ? "auto" : "hidden";
+
+        // El gráfico conserva su altura completa dentro del scroll.
+        interior.style.height = alturaGrafico + "px";
+        interior.style.minHeight = alturaGrafico + "px";
+        interior.style.position = "relative";
+        interior.style.width = "100%";
+    }
+
+    crearGrafico("inspectorChart", {
+        type: "bar",
+
+        data: {
+            labels: ranking.map(x => x[0]),
+
+            datasets: [{
+                label: "Viviendas inspeccionadas",
+                data: ranking.map(x => x[1]),
+                backgroundColor: "#75bce7",
+                borderColor: "#269bb0",
+                borderWidth: 1,
+                borderRadius: 4,
+                borderSkipped: false,
+                barThickness: 17,
+                maxBarThickness: 19
+            }]
+        },
+
+        options: {
+            indexAxis: "y",
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+
+            layout: {
+                padding: {
+                    left: 8,
+                    right: 16,
+                    top: 8,
+                    bottom: 8
+                }
+            },
+
+            plugins: {
+                legend: {
+                    display: false
+                },
+
+                tooltip: {
+                    callbacks: {
+                        label: context =>
+                            " Viviendas inspeccionadas: " +
+                            fmt(context.raw)
+                    }
+                }
+            },
+
+            scales: {
+                x: {
+                    beginAtZero: true,
+
+                    ticks: {
+                        precision: 0,
+                        callback: value => fmt(value)
+                    },
+
+                    grid: {
+                        color: "rgba(22, 69, 99, 0.08)"
+                    }
+                },
+
+                y: {
+                    offset: true,
+
+                    grid: {
+                        display: false
+                    },
+
+                    ticks: {
+                        autoSkip: false,
+                        padding: 8,
+                        font: {
+                            size: window.innerWidth < 600 ? 10 : 11
+                        }
+                    }
+                }
+            }
+        }
+    });
 }
+
+function configurarLimiteGraficoInspector() {
+    const selector = document.getElementById("inspectorChartLimit");
+
+    if (!selector || selector.dataset.configurado === "true") {
+        return;
+    }
+
+    selector.addEventListener("change", actualizarInspector);
+    selector.dataset.configurado = "true";
+}
+
 
 function actualizarLocalidad() {
     const o = agruparInspeccionadas("localidad_eess", "Sin localidad");

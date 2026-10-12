@@ -905,3 +905,86 @@ td:first-child {
         width: 155px;
     }
 }
+
+
+/* =====================================================
+   GRÁFICO DE VIVIENDAS INSPECCIONADAS POR INSPECTOR
+   ===================================================== */
+
+.inspector-chart-controls {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+    color: #164563;
+    font-size: 11px;
+}
+
+.inspector-chart-controls label {
+    font-weight: 700;
+}
+
+.inspector-chart-controls select {
+    min-height: 30px;
+    padding: 5px 9px;
+    border: 1px solid #cbd8df;
+    border-radius: 7px;
+    background: #fff;
+    color: #244d66;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.inspector-chart-scroll {
+    width: 100%;
+    height: 220px;
+    max-height: 460px;
+    min-width: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: relative;
+    scrollbar-width: thin;
+    scrollbar-color: #9fc8d5 #edf4f7;
+}
+
+.inspector-chart-scroll::-webkit-scrollbar {
+    width: 7px;
+}
+
+.inspector-chart-scroll::-webkit-scrollbar-track {
+    background: #edf4f7;
+    border-radius: 8px;
+}
+
+.inspector-chart-scroll::-webkit-scrollbar-thumb {
+    background: #9fc8d5;
+    border-radius: 8px;
+}
+
+.inspector-chart-inner {
+    width: 100%;
+    min-width: 0;
+    position: relative;
+}
+
+.inspector-chart-inner canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+@media (max-width: 600px) {
+    .inspector-chart-controls {
+        justify-content: space-between;
+    }
+
+    .inspector-chart-controls select {
+        max-width: 145px;
+    }
+
+    .inspector-chart-scroll {
+        max-height: 400px;
+    }
+}

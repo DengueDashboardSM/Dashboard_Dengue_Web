@@ -401,20 +401,31 @@
 <section class="dashboard-grid third">
 
     <!-- INSPECTOR -->
-    <div class="panel">
-        <div class="panel-title">👤 Viviendas inspeccionadas por inspector</div>
-        <div class="chart-container">
+    
+<div class="panel">
+    <div class="panel-title">
+        👤 Viviendas inspeccionadas por inspector
+    </div>
+
+    <div class="inspector-chart-controls">
+        <label for="inspectorChartLimit">
+            Mostrar:
+        </label>
+
+        <select id="inspectorChartLimit">
+            <option value="10">Top 10</option>
+            <option value="15">Top 15</option>
+            <option value="all" selected>Todos</option>
+        </select>
+    </div>
+
+    <div class="inspector-chart-scroll">
+        <div class="inspector-chart-inner">
             <canvas id="inspectorChart"></canvas>
         </div>
     </div>
+</div>
 
-    <!-- LOCALIDAD -->
-    <div class="panel">
-        <div class="panel-title">📍 Viviendas inspeccionadas por localidad</div>
-        <div class="chart-container">
-            <canvas id="localityChart"></canvas>
-        </div>
-    </div>
 
     <!-- TABLA -->
     <div class="panel table-panel">
