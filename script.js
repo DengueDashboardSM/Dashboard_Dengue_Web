@@ -2571,3 +2571,273 @@ function descargarDirecciones() {
 
 
 console.log("Dashboard Dengue cargado correctamente.");
+
+// ============================================================
+// CORRECCIÓN DE INDICADORES DEL DASHBOARD DE DENGUE
+// Pegar al FINAL de script.js
+// Conserva las demás funciones existentes
+// ============================================================
+
+// Identificador único de vivienda.
+// Prioriza _uid y utiliza localidad, sector, manzana y dirección
+// como alternativa cuando no exista _uid.
+function claveViviendaDengue(f) {
+    const uid = texto(f._uid);
+
+    if (uid) {
+        return "UID:" + uid;
+    }
+
+    const localidad = texto(f.localidad_eess).toUpperCase();
+    const sector = texto(f.sector).toUpperCase();
+    const manzana = texto(f.codigo_manzana).toUpperCase();
+    const direccion = texto(f.direccion).toUpperCase();
+
+    if (localidad && manzana && direccion) {
+        return [
+            "DIR",
+            localidad,
+            sector,
+            manzana,
+            direccion
+        ].join("|");
+    }
+
+    // Sin identificador suficiente, se conserva el registro.
+    return "REGISTRO:" + datosOriginales.indexOf(f);
+}
+
+// Determina si el campo de recuperación contiene un valor válido.
+function recuperada(f) {
+    const valor = texto(
+        f.recuperacion_vivienda_indicador_ini
+    ).toLowerCase();
+
+    if (!valor) return false;
+
+    const valoresNoValidos = [
+        "0",
+        "no",
+        "false",
+        "null",
+        "undefined",
+        "n/a",
+        "na",
+        "no aplica"
+    ];
+
+    return !valoresNoValidos.includes(valor);
+}
+
+// Cuenta viviendas únicas que cumplen una condición.
+function contarViviendasUnicasDengue(registros, condicion) {
+    const viviendas = new Set();
+
+    registros.forEach(f => {
+        if (condicion(f)) {
+            viviendas.add(claveViviendaDengue(f));
+        }
+    });
+
+    return viviendas.size;
+}
+
+// ============================================================
+// TARJETAS PRINCIPALES
+// ============================================================
+
+function actualizarTarjetas() {
+    setTexto(
+        "totalInspeccionadas",
+        fmt(contarViviendasUnicasDengue(
+            datosFiltrados,
+            inspeccionada
+        ))
+    );
+
+    setTexto(
+        "totalCerradas",
+        fmt(contarViviendasUnicasDengue(
+            datosFiltrados,
+            cerrada
+        ))
+    );
+
+    setTexto(
+        "totalRenuentes",
+        fmt(contarViviendasUnicasDengue(
+            datosFiltrados,
+            renuente
+        ))
+    );
+
+    setTexto(
+        "totalDeshabitadas",
+        fmt(contarViviendasUnicasDengue(
+            datosFiltrados,
+            deshabitada
+        ))
+    );
+
+    setTexto(
+        "totalRecuperadas",
+        fmt(contarViviendasUnicasDengue(
+            datosFiltrados,
+            recuperada
+        ))
+    );
+
+    const inspectores = new Set(
+        datosFiltrados
+            .map(f => texto(f.nombre_inspector))
+            .filter(Boolean)
+    );
+
+    setTexto("totalInspectores", fmt(inspectores.size));
+}
+
+// ============================================================
+// COBERTURA DE INSPECCIÓN
+// ============================================================
+
+function actualizarCobertura() {
+    const totalBase = new Set(
+        datosFiltrados
+            .map(claveViviendaDengue)
+    ).size;
+
+    const totalInspeccionadas =
+        contarViviendasUnicasDengue(
+            datosFiltrados,
+            inspeccionada
+        );
+
+    const porcentaje = totalBase > 0
+        ? Math.min(
+            100,
+            Number(
+                (totalInspeccionadas / totalBase * 100)
+                    .toFixed(1)
+            )
+        )
+        : 0;
+
+    setTexto("coveragePercent", porcentaje + "%");
+    setTexto("coverageInspeccionadas", fmt(totalInspeccionadas));
+    setTexto("coverageTotal", fmt(totalBase));
+
+    const progreso = document.getElementById("coverageProgress");
+
+    if (progreso) {
+        progreso.style.width = porcentaje + "%";
+    }
+
+    crearGrafico("coverageChart", {
+        type: "doughnut",
+        data: {
+            labels: [
+                "Inspeccionadas",
+                "No inspeccionadas"
+            ],
+            datasets: [{
+                data: [
+                    porcentaje,
+                    Math.max(0, 100 - porcentaje)
+                ],
+                backgroundColor: [
+                    "#269bb0",
+                    "#e8edf0"
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: "70%",
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: c => c.label + ": " +
+                            (c.dataIndex === 0
+                                ? porcentaje
+                                : Math.max(0, 100 - porcentaje)) +
+                            "%"
+                    }
+                }
+            }
+        }
+    });
+}
+
+// ============================================================
+// DIAGNÓSTICO DE LOS DATOS REALES DEL CSV
+// ============================================================
+
+function diagnosticarIndicadoresDengue() {
+    const filas = datosOriginales;
+
+    const ids = new Set(
+        filas.map(f => texto(f._uid)).filter(Boolean)
+    );
+
+    const sinUid = filas.filter(
+        f => !texto(f._uid)
+    ).length;
+
+    const recuperacionesValidas =
+        filas.filter(recuperada).length;
+
+    const viviendasRecuperadas =
+        contarViviendasUnicasDengue(
+            filas,
+            recuperada
+        );
+
+    const viviendasInspeccionadas =
+        contarViviendasUnicasDengue(
+            filas,
+            inspeccionada
+        );
+
+    const totalBase = new Set(
+        filas.map(claveViviendaDengue)
+    ).size;
+
+    console.table({
+        "Filas cargadas del CSV": filas.length,
+        "UID únicos no vacíos": ids.size,
+        "Filas sin UID": sinUid,
+        "Filas con recuperación válida": recuperacionesValidas,
+        "Viviendas recuperadas únicas": viviendasRecuperadas,
+        "Viviendas inspeccionadas únicas": viviendasInspeccionadas,
+        "Total de viviendas base": totalBase,
+        "Cobertura calculada (%)": totalBase
+            ? (viviendasInspeccionadas / totalBase * 100).toFixed(1)
+            : "0.0"
+    });
+
+    console.log(
+        "Valores originales de recuperación:",
+        [...new Set(
+            filas.map(f =>
+                texto(f.recuperacion_vivienda_indicador_ini)
+            )
+        )]
+    );
+}
+
+// Ejecutar diagnóstico cuando se carguen los datos.
+const diagnosticoAnteriorDengue = procesarDatos;
+
+procesarDatos = function(datos) {
+    diagnosticoAnteriorDengue(datos);
+    diagnosticarIndicadoresDengue();
+};
+
+console.log(
+    "Corrección de indicadores de dengue cargada."
+);
