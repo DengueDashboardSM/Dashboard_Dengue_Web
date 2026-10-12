@@ -169,10 +169,18 @@ function obtenerFecha(valor) {
     let fecha = null;
     let m;
 
-    if ((m = valor.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/))) {
-        fecha = new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1]));
-    } else if ((m = valor.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/))) {
-        fecha = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+    if ((m = valor.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})/))) {
+        fecha = new Date(
+            Number(m[3]),
+            Number(m[2]) - 1,
+            Number(m[1])
+        );
+    } else if ((m = valor.match(/^(\d{4})[\/.-](\d{1,2})[\/.-](\d{1,2})/))) {
+        fecha = new Date(
+            Number(m[1]),
+            Number(m[2]) - 1,
+            Number(m[3])
+        );
     } else {
         fecha = new Date(valor);
     }
@@ -185,40 +193,27 @@ function fijarTextoFecha(principal, secundario) {
     setTexto("horaActualizacion", secundario);
 }
 
-function actualizarFecha() {
-    const fechas = datosOriginales
-        .map(f => obtenerFecha(f.fecha_inspeccion))
-        .filter(Boolean);
+async function actualizarFecha() {
+    try {
+        const respuesta = await fetch(
+            "./actualizacion.json?v=" + Date.now(),
+            { cache: "no-store" }
+        );
 
-    const fechaElemento = document.getElementById("fechaActualizacion");
-    const horaElemento = document.getElementById("horaActualizacion");
+        if (!respuesta.ok) {
+            throw new Error("No se pudo leer actualizacion.json");
+        }
 
-    if (fechas.length === 0) {
-        if (fechaElemento) fechaElemento.textContent = "Sin fecha";
-        if (horaElemento) horaElemento.innerHTML = "Datos Reales y Registrados";
-        return;
-    }
+        const datos = await respuesta.json();
 
-    let max = fechas[0].getTime();
+        fijarTextoFecha(
+            datos.fecha || "Sin fecha",
+            "Hora de actualización: " + (datos.hora || "Sin hora")
+        );
 
-    fechas.forEach(f => {
-        if (f.getTime() > max) max = f.getTime();
-    });
-
-    const u = new Date(max);
-    const dia = String(u.getDate()).padStart(2, "0");
-    const mes = String(u.getMonth() + 1).padStart(2, "0");
-    const año = u.getFullYear();
-
-    if (fechaElemento) fechaElemento.textContent = `${dia}/${mes}/${año}`;
-
-    if (horaElemento) {
-        // Hora real en que se abrió/cargó el dashboard
-        const hora = new Date().toLocaleTimeString("es-PE", {
-            hour: "2-digit",
-            minute: "2-digit"
-        });
-        horaElemento.innerHTML = `Hora de actualizacion <strong>${hora}</strong>`;
+    } catch (error) {
+        console.error("Error leyendo fecha de actualización:", error);
+        fijarTextoFecha("Sin registro", "Actualización no disponible");
     }
 }
 
