@@ -7,7 +7,7 @@ let datosOriginales = [];
 let datosFiltrados = [];
 let charts = {};
 let mapa = null;
-let marcadores = [];
+let grupoMarcadores = null;
 const ARCHIVO_CSV = "datos.csv";
 let busquedaInspector = "";
 
@@ -195,7 +195,12 @@ function actualizarFecha() {
     if (fechaElemento) fechaElemento.textContent = `${dia}/${mes}/${año}`;
 
     if (horaElemento) {
-        horaElemento.innerHTML = `Hora de actualizacion <strong>08:06 a. m.</strong>`;
+        // Hora real en que se abrió/cargó el dashboard
+        const hora = new Date().toLocaleTimeString("es-PE", {
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+        horaElemento.innerHTML = `Hora de actualizacion <strong>${hora}</strong>`;
     }
 }
 
@@ -743,8 +748,18 @@ function actualizarTabla() {
 }
 
 // ============================================================
-// MAPA
+// MAPA (estilo "Viviendas Registradas": círculos agrupados)
 // ============================================================
+
+function colorEstado(fila) {
+    switch (estadoVivienda(fila)) {
+        case "CERRADA": return "#111111";
+        case "RENUENTE": return "#a855f7";
+        case "DESHABITADA": return "#f97316";
+        case "RECUPERADA": return "#38aa43";
+        default: return "#2563eb"; // inspeccionada
+    }
+}
 
 function inicializarMapa() {
 
@@ -752,53 +767,123 @@ function inicializarMapa() {
 
     if (!elemento || typeof L === "undefined" || mapa) return;
 
-    mapa = L.map("map").setView([-6.4869, -76.3625], 11);
+    mapa = L.map("map").setView([-6.4869, -76.3625], 12);
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "&copy; OpenStreetMap"
+    // Mapa base claro
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+        subdomains: "abcd",
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap &copy; CARTO"
     }).addTo(mapa);
+
+    // Círculos azules grandes con el número adentro
+    grupoMarcadores = L.markerClusterGroup({
+        chunkedLoading: true,
+        maxClusterRadius: 60,
+        iconCreateFunction: function (cluster) {
+            const n = cluster.getChildCount();
+            const tam = n < 20 ? 32 : n < 100 ? 42 : 54;
+            return L.divIcon({
+                html: `<div style="width:${tam}px;height:${tam}px;line-height:${tam}px;
+                    border-radius:50%;background:#1d1df0;color:#fff;text-align:center;
+                    font-weight:600;font-size:13px;box-shadow:0 0 0 3px rgba(29,29,240,.25)">${n}</div>`,
+                className: "",
+                iconSize: [tam, tam]
+            });
+        }
+    });
+
+    mapa.addLayer(grupoMarcadores);
+
+    // Leyenda de colores
+    const leyenda = L.control({ position: "topleft" });
+
+    leyenda.onAdd = function () {
+        const div = L.DomUtil.create("div");
+        div.style.cssText =
+            "background:#fff;padding:5px 8px;border-radius:6px;font-size:11px;" +
+            "box-shadow:0 1px 4px rgba(0,0,0,.25);margin-top:70px";
+        div.innerHTML =
+            '<span style="color:#2563eb">●</span> Inspeccionadas &nbsp;' +
+            '<span style="color:#111">●</span> Cerradas &nbsp;' +
+            '<span style="color:#a855f7">●</span> Renuentes &nbsp;' +
+            '<span style="color:#f97316">●</span> Deshabitadas &nbsp;' +
+            '<span style="color:#38aa43">●</span> Recuperadas';
+        return div;
+    };
+
+    leyenda.addTo(mapa);
+
+    // Botón de pantalla completa (arriba a la derecha)
+    const pantalla = L.control({ position: "topright" });
+
+    pantalla.onAdd = function () {
+        const btn = L.DomUtil.create("a", "leaflet-bar");
+        btn.href = "#";
+        btn.title = "Pantalla completa";
+        btn.innerHTML = "⛶";
+        btn.style.cssText =
+            "background:#fff;width:30px;height:30px;line-height:30px;" +
+            "text-align:center;font-size:18px;color:#333;text-decoration:none;display:block";
+        L.DomEvent.on(btn, "click", function (e) {
+            L.DomEvent.preventDefault(e);
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            } else {
+                elemento.requestFullscreen();
+            }
+        });
+        return btn;
+    };
+
+    pantalla.addTo(mapa);
+
+    document.addEventListener("fullscreenchange", () => {
+        setTimeout(() => mapa.invalidateSize(), 200);
+    });
 }
 
 function actualizarMapa() {
 
-    if (!mapa) return;
+    if (!mapa || !grupoMarcadores) return;
 
-    marcadores.forEach(m => mapa.removeLayer(m));
+    grupoMarcadores.clearLayers();
 
-    marcadores = [];
+    const capas = [];
 
-    let contador = 0;
-
-    datosFiltrados.filter(inspeccionada).forEach(fila => {
-
-        if (contador >= 1500) return;
+    datosFiltrados.forEach(fila => {
 
         const lat = numero(fila.georeferencia_Y);
         const lng = numero(fila.georeferencia_X);
 
         if (!lat || !lng) return;
-
         if (lat < -20 || lat > 5 || lng < -85 || lng > -65) return;
 
+        const color = colorEstado(fila);
+
         const marcador = L.circleMarker([lat, lng], {
-            radius: 4,
-            color: "#078ca5",
-            fillColor: "#269bb0",
-            fillOpacity: 0.55,
-            weight: 1
-        })
-            .bindPopup(`
-                <strong>Vivienda inspeccionada</strong><br>
-                📍 ${texto(fila.localidad_eess)}<br>
-                🏠 ${texto(fila.direccion)}<br>
-                👤 ${texto(fila.nombre_inspector)}
-            `)
-            .addTo(mapa);
+            radius: 6,
+            color: "#ffffff",
+            weight: 1,
+            fillColor: color,
+            fillOpacity: 0.9
+        }).bindPopup(`
+            <strong>${estadoVivienda(fila)}</strong><br>
+            📍 ${texto(fila.localidad_eess)}<br>
+            🏠 ${texto(fila.direccion)}<br>
+            👤 ${texto(fila.nombre_inspector)}<br>
+            📅 ${texto(fila.fecha_inspeccion)}
+        `);
 
-        marcadores.push(marcador);
-
-        contador++;
+        capas.push(marcador);
     });
+
+    grupoMarcadores.addLayers(capas);
+
+    // Zoom automático a las viviendas filtradas
+    if (capas.length > 0) {
+        mapa.fitBounds(grupoMarcadores.getBounds(), { padding: [20, 20], maxZoom: 16 });
+    }
 }
 
 // ============================================================

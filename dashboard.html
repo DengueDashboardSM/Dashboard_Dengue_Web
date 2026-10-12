@@ -4,16 +4,11 @@
 <head>
 
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Inspecciones y Control de Dengue</title>
 
-    <title>
-        Dashboard de Inspecciones y Control de Dengue
-    </title>
-
-    <link rel="stylesheet"
-          href="style.css">
+    <link rel="stylesheet" href="style.css">
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -25,10 +20,13 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <!-- Leaflet -->
-    <link rel="stylesheet"
-          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Leaflet MarkerCluster (círculos agrupados) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
 </head>
 
@@ -42,65 +40,29 @@
 
 <header class="header">
 
-
     <div class="logo-area">
-
-        <img
-            src="img/logo.png"
-            alt="Dirección Regional de Salud San Martín">
-
+        <img src="img/logo.png" alt="Dirección Regional de Salud San Martín">
     </div>
-
 
     <div class="title-area">
-
-        <h1>
-            DASHBOARD DE INSPECCIONES Y CONTROL DE DENGUE
-        </h1>
-
-        <p>
-            Seguimiento de viviendas, criaderos e intervenciones de control vectorial
-        </p>
-
+        <h1>DASHBOARD DE INSPECCIONES Y CONTROL DE DENGUE</h1>
+        <p>Seguimiento de viviendas, criaderos e intervenciones de control vectorial</p>
     </div>
-
 
     <div class="mosquito-area">
-
-        <img
-            src="img/mosquito.png"
-            alt="Mosquito Aedes aegypti">
-
+        <img src="img/mosquito.png" alt="Mosquito Aedes aegypti">
     </div>
-
 
     <div class="update-box">
-
-        <div class="calendar-icon">
-            📅
-        </div>
-
+        <div class="calendar-icon">📅</div>
         <div class="update-content">
-
-            <strong>
-                Última actualización
-            </strong>
-
-            <span id="fechaActualizacion">
-                Cargando...
-            </span>
-
-            <small id="horaActualizacion">
-                Datos Reales y Registrados
-            </small>
-
+            <strong>Última actualización</strong>
+            <span id="fechaActualizacion">Cargando...</span>
+            <small id="horaActualizacion">Datos Reales y Registrados</small>
         </div>
-
     </div>
 
-
 </header>
-
 
 
 <!-- =====================================================
@@ -109,96 +71,70 @@
 
 <section class="filters">
 
-
     <!-- LOCALIDAD -->
+    <div class="filter">
+        <label>📍 Localidad</label>
+        <select id="filtroLocalidad">
+            <option value="Todas">Todas</option>
+        </select>
+    </div>
 
+    <!-- MES Y CALENDARIO -->
     <div class="filter">
 
-        <label>
-            📍 Localidad
-        </label>
+        <label for="filtroMes">📅 Mes</label>
 
-        <select id="filtroLocalidad">
-
-            <option value="Todas">
-                Todas
-            </option>
-
+        <select id="filtroMes">
+            <option value="Todos">Todos</option>
         </select>
+
+        <label for="filtroFecha" style="margin-top: 8px;">🗓️ Seleccionar fecha</label>
+
+        <input
+            type="date"
+            id="filtroFecha"
+            style="
+                width: 100%;
+                box-sizing: border-box;
+                height: 36px;
+                margin-top: 5px;
+                padding: 6px 8px;
+                border: 1px solid #cbd8df;
+                border-radius: 7px;
+                background: white;
+                color: #263746;
+                font-size: 12px;
+            "
+        >
+
+        <button
+            id="btnLimpiarFecha"
+            type="button"
+            style="
+                width: 100%;
+                margin-top: 6px;
+                padding: 7px;
+                border: none;
+                border-radius: 6px;
+                background: #078ca5;
+                color: white;
+                font-weight: bold;
+                cursor: pointer;
+            "
+        >
+            ↺ Limpiar fecha
+        </button>
 
     </div>
 
-
-    <!-- MES Y CALENDARIO -->
-
-<div class="filter">
-
-    <label for="filtroMes">
-        📅 Mes
-    </label>
-
-    <select id="filtroMes">
-        <option value="Todos">Todos</option>
-    </select>
-
-    <label for="filtroFecha" style="margin-top: 8px;">
-        🗓️ Seleccionar fecha
-    </label>
-
-    <input
-        type="date"
-        id="filtroFecha"
-        style="
-            width: 100%;
-            box-sizing: border-box;
-            height: 36px;
-            margin-top: 5px;
-            padding: 6px 8px;
-            border: 1px solid #cbd8df;
-            border-radius: 7px;
-            background: white;
-            color: #263746;
-            font-size: 12px;
-        "
-    >
-
-    <button
-        id="btnLimpiarFecha"
-        type="button"
-        style="
-            width: 100%;
-            margin-top: 6px;
-            padding: 7px;
-            border: none;
-            border-radius: 6px;
-            background: #078ca5;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-        "
-    >
-        ↺ Limpiar fecha
-    </button>
-
-</div>
-
-
     <!-- INSPECTOR -->
-
     <div class="filter">
 
-        <label>
-            👤 Inspector
-        </label>
+        <label>👤 Inspector</label>
 
         <select id="filtroInspector">
-
-            <option value="Todos">
-                Todos
-            </option>
-
+            <option value="Todos">Todos</option>
         </select>
-
 
         <input
             type="text"
@@ -213,8 +149,8 @@
                 border-radius:7px;
                 font-size:10px;
                 outline:none;
+                box-sizing:border-box;
             ">
-
 
         <button
             id="btnBuscarInspector"
@@ -230,75 +166,36 @@
                 font-weight:bold;
                 cursor:pointer;
             ">
-
             🔎 Buscar
-
         </button>
 
     </div>
 
-
     <!-- SECTOR -->
-
     <div class="filter">
-
-        <label>
-            🗺️ Sector
-        </label>
-
+        <label>🗺️ Sector</label>
         <select id="filtroSector">
-
-            <option value="Todos">
-                Todos
-            </option>
-
+            <option value="Todos">Todos</option>
         </select>
-
     </div>
-
 
     <!-- TIPO -->
-
     <div class="filter">
-
-        <label>
-            📋 Tipo de inspección
-        </label>
-
+        <label>📋 Tipo de inspección</label>
         <select id="filtroTipo">
-
-            <option value="Todos">
-                Todos
-            </option>
-
+            <option value="Todos">Todos</option>
         </select>
-
     </div>
-
 
     <!-- MANZANA -->
-
     <div class="filter">
-
-        <label>
-            🏘️ Código de manzana
-        </label>
-
+        <label>🏘️ Código de manzana</label>
         <select id="filtroManzana">
-
-            <option value="Todas">
-                Todas
-            </option>
-
+            <option value="Todas">Todas</option>
         </select>
-
     </div>
 
-
-    <!-- =================================================
-         BOTONES DE DESCARGA
-    ================================================== -->
-
+    <!-- BOTONES DE DESCARGA -->
     <div style="
         grid-column:1 / -1;
         display:flex;
@@ -307,69 +204,30 @@
         margin-top:2px;
     ">
 
-
         <button
             id="btnExcelLocalidad"
             type="button"
-            style="
-                background:#078ca5;
-                color:white;
-                border:none;
-                border-radius:6px;
-                padding:7px 12px;
-                font-size:10px;
-                font-weight:bold;
-                cursor:pointer;
-            ">
-
+            style="background:#078ca5;color:white;border:none;border-radius:6px;padding:7px 12px;font-size:10px;font-weight:bold;cursor:pointer;">
             📥 Descargar detalles por localidad
-
         </button>
-
 
         <button
             id="btnExcelInspector"
             type="button"
-            style="
-                background:#078ca5;
-                color:white;
-                border:none;
-                border-radius:6px;
-                padding:7px 12px;
-                font-size:10px;
-                font-weight:bold;
-                cursor:pointer;
-            ">
-
+            style="background:#078ca5;color:white;border:none;border-radius:6px;padding:7px 12px;font-size:10px;font-weight:bold;cursor:pointer;">
             📥 Descargar viviendas por inspector
-
         </button>
-
 
         <button
             id="btnExcelDirecciones"
             type="button"
-            style="
-                background:#078ca5;
-                color:white;
-                border:none;
-                border-radius:6px;
-                padding:7px 12px;
-                font-size:10px;
-                font-weight:bold;
-                cursor:pointer;
-            ">
-
+            style="background:#078ca5;color:white;border:none;border-radius:6px;padding:7px 12px;font-size:10px;font-weight:bold;cursor:pointer;">
             📥 Descargar direcciones
-
         </button>
-
 
     </div>
 
-
 </section>
-
 
 
 <!-- =====================================================
@@ -378,191 +236,66 @@
 
 <section class="cards">
 
-
-    <!-- INSPECCIONADAS -->
-
     <div class="card cyan">
-
-        <div class="card-icon">
-            🏠
-        </div>
-
+        <div class="card-icon">🏠</div>
         <div class="card-data">
-
-            <h3>
-                Viviendas inspeccionadas
-            </h3>
-
-            <strong id="totalInspeccionadas">
-                0
-            </strong>
-
-            <p class="up">
-                Datos reales
-            </p>
-
-            <small>
-                del CSV
-            </small>
-
+            <h3>Viviendas inspeccionadas</h3>
+            <strong id="totalInspeccionadas">0</strong>
+            <p class="up">Datos reales</p>
+            <small>del CSV</small>
         </div>
-
     </div>
-
-
-    <!-- CERRADAS -->
 
     <div class="card red">
-
-        <div class="card-icon">
-            🔒
-        </div>
-
+        <div class="card-icon">🔒</div>
         <div class="card-data">
-
-            <h3>
-                Viviendas cerradas
-            </h3>
-
-            <strong id="totalCerradas">
-                0
-            </strong>
-
-            <p class="up">
-                Datos reales
-            </p>
-
-            <small>
-                del CSV
-            </small>
-
+            <h3>Viviendas cerradas</h3>
+            <strong id="totalCerradas">0</strong>
+            <p class="up">Datos reales</p>
+            <small>del CSV</small>
         </div>
-
     </div>
-
-
-    <!-- RENUENTES -->
 
     <div class="card yellow">
-
-        <div class="card-icon">
-            🚫
-        </div>
-
+        <div class="card-icon">🚫</div>
         <div class="card-data">
-
-            <h3>
-                Viviendas renuentes
-            </h3>
-
-            <strong id="totalRenuentes">
-                0
-            </strong>
-
-            <p class="up">
-                Datos reales
-            </p>
-
-            <small>
-                del CSV
-            </small>
-
+            <h3>Viviendas renuentes</h3>
+            <strong id="totalRenuentes">0</strong>
+            <p class="up">Datos reales</p>
+            <small>del CSV</small>
         </div>
-
     </div>
-
-
-    <!-- DESHABITADAS -->
 
     <div class="card purple">
-
-        <div class="card-icon">
-            🏚️
-        </div>
-
+        <div class="card-icon">🏚️</div>
         <div class="card-data">
-
-            <h3>
-                Viviendas deshabitadas
-            </h3>
-
-            <strong id="totalDeshabitadas">
-                0
-            </strong>
-
-            <p class="down">
-                Datos reales
-            </p>
-
-            <small>
-                del CSV
-            </small>
-
+            <h3>Viviendas deshabitadas</h3>
+            <strong id="totalDeshabitadas">0</strong>
+            <p class="down">Datos reales</p>
+            <small>del CSV</small>
         </div>
-
     </div>
-
-
-    <!-- RECUPERADAS -->
 
     <div class="card green">
-
-        <div class="card-icon">
-            ♻️
-        </div>
-
+        <div class="card-icon">♻️</div>
         <div class="card-data">
-
-            <h3>
-                Viviendas recuperadas
-            </h3>
-
-            <strong id="totalRecuperadas">
-                0
-            </strong>
-
-            <p class="up">
-                Datos disponibles
-            </p>
-
-            <small>
-                del CSV
-            </small>
-
+            <h3>Viviendas recuperadas</h3>
+            <strong id="totalRecuperadas">0</strong>
+            <p class="up">Datos disponibles</p>
+            <small>del CSV</small>
         </div>
-
     </div>
-
-
-    <!-- INSPECTORES -->
 
     <div class="card blue">
-
-        <div class="card-icon">
-            👥
-        </div>
-
+        <div class="card-icon">👥</div>
         <div class="card-data">
-
-            <h3>
-                Número de inspectores
-            </h3>
-
-            <strong id="totalInspectores">
-                0
-            </strong>
-
-            <small>
-                Registrados en CSV
-            </small>
-
+            <h3>Número de inspectores</h3>
+            <strong id="totalInspectores">0</strong>
+            <small>Registrados en CSV</small>
         </div>
-
     </div>
 
-
 </section>
-
 
 
 <!-- =====================================================
@@ -571,91 +304,39 @@
 
 <section class="dashboard-grid">
 
-
     <!-- COBERTURA -->
-
     <div class="panel">
 
-        <div class="panel-title">
-            📍 Cobertura de inspección
-        </div>
-
+        <div class="panel-title">📍 Cobertura de inspección</div>
 
         <div class="coverage">
 
-
             <div class="donut">
-
                 <canvas id="coverageChart"></canvas>
-
                 <div class="donut-text">
-
-                    <strong id="coveragePercent">
-                        0%
-                    </strong>
-
-                    <span>
-                        Cobertura<br>
-                        de inspección
-                    </span>
-
+                    <strong id="coveragePercent">0%</strong>
+                    <span>Cobertura<br>de inspección</span>
                 </div>
-
             </div>
-
 
             <div class="coverage-info">
 
-
                 <div>
-
-                    🏠
-
-                    <strong id="coverageInspeccionadas">
-                        0
-                    </strong>
-
-                    <span>
-                        Viviendas inspeccionadas
-                    </span>
-
+                    🏠 <strong id="coverageInspeccionadas">0</strong>
+                    <span>Viviendas inspeccionadas</span>
                 </div>
 
-
                 <div>
-
-                    🏠
-
-                    <strong id="coverageTotal">
-                        0
-                    </strong>
-
-                    <span>
-                        Total viviendas base
-                    </span>
-
+                    🏠 <strong id="coverageTotal">0</strong>
+                    <span>Total viviendas base</span>
                 </div>
 
-
                 <div>
-
-                    🎯
-
-                    <strong>
-                        Meta anual: 80%
-                    </strong>
-
+                    🎯 <strong>Meta anual: 80%</strong>
                     <div class="progress">
-
-                        <div
-                            id="coverageProgress"
-                            style="width:0%">
-                        </div>
-
+                        <div id="coverageProgress" style="width:0%"></div>
                     </div>
-
                 </div>
-
 
             </div>
 
@@ -663,45 +344,23 @@
 
     </div>
 
-
-
     <!-- CONDICIÓN -->
-
     <div class="panel">
-
-        <div class="panel-title">
-            📊 Viviendas por condición
-        </div>
-
+        <div class="panel-title">📊 Viviendas por condición</div>
         <div class="chart-container">
-
             <canvas id="conditionChart"></canvas>
-
         </div>
-
     </div>
-
-
 
     <!-- RANKING -->
-
     <div class="panel">
-
-        <div class="panel-title">
-            🏆 Ranking TOP 10 de tipos de criadero
-        </div>
-
+        <div class="panel-title">🏆 Ranking TOP 10 de tipos de criadero</div>
         <div class="chart-container">
-
             <canvas id="rankingChart"></canvas>
-
         </div>
-
     </div>
 
-
 </section>
-
 
 
 <!-- =====================================================
@@ -710,58 +369,29 @@
 
 <section class="dashboard-grid second">
 
-
     <!-- POR MES -->
-
     <div class="panel">
-
-        <div class="panel-title">
-            📈 Viviendas inspeccionadas por mes
-        </div>
-
+        <div class="panel-title">📈 Viviendas inspeccionadas por mes</div>
         <div class="chart-container">
-
             <canvas id="monthlyChart"></canvas>
-
         </div>
-
     </div>
-
-
 
     <!-- MAPA -->
-
     <div class="panel">
-
-        <div class="panel-title">
-            🗺️ Viviendas inspeccionadas por localidad
-        </div>
-
+        <div class="panel-title">🗺️ Viviendas inspeccionadas por localidad</div>
         <div id="map"></div>
-
     </div>
-
-
 
     <!-- SECTOR -->
-
     <div class="panel">
-
-        <div class="panel-title">
-            📊 Por sector
-        </div>
-
+        <div class="panel-title">📊 Por sector</div>
         <div class="chart-container">
-
             <canvas id="sectorChart"></canvas>
-
         </div>
-
     </div>
 
-
 </section>
-
 
 
 <!-- =====================================================
@@ -770,98 +400,44 @@
 
 <section class="dashboard-grid third">
 
-
     <!-- INSPECTOR -->
-
     <div class="panel">
-
-        <div class="panel-title">
-            👤 Viviendas inspeccionadas por inspector
-        </div>
-
+        <div class="panel-title">👤 Viviendas inspeccionadas por inspector</div>
         <div class="chart-container">
-
             <canvas id="inspectorChart"></canvas>
-
         </div>
-
     </div>
-
-
 
     <!-- LOCALIDAD -->
-
     <div class="panel">
-
-        <div class="panel-title">
-            📍 Viviendas inspeccionadas por localidad
-        </div>
-
+        <div class="panel-title">📍 Viviendas inspeccionadas por localidad</div>
         <div class="chart-container">
-
             <canvas id="localityChart"></canvas>
-
         </div>
-
     </div>
 
-
-
     <!-- TABLA -->
-
     <div class="panel table-panel">
 
-        <div class="panel-title">
-            📋 Detalle por localidad
-        </div>
-
+        <div class="panel-title">📋 Detalle por localidad</div>
 
         <table>
-
             <thead>
-
                 <tr>
-
-                    <th>
-                        Localidad
-                    </th>
-
-                    <th>
-                        Inspeccionadas
-                    </th>
-
-                    <th>
-                        Cerradas
-                    </th>
-
-                    <th>
-                        Renuentes
-                    </th>
-
-                    <th>
-                        Deshabitadas
-                    </th>
-
-                    <th>
-                        Recuperadas
-                    </th>
-
+                    <th>Localidad</th>
+                    <th>Inspeccionadas</th>
+                    <th>Cerradas</th>
+                    <th>Renuentes</th>
+                    <th>Deshabitadas</th>
+                    <th>Recuperadas</th>
                 </tr>
-
             </thead>
-
-
-            <tbody id="tablaLocalidades">
-
-            </tbody>
-
+            <tbody id="tablaLocalidades"></tbody>
         </table>
 
     </div>
 
-
 </section>
-
 
 
 <!-- =====================================================
@@ -869,7 +445,6 @@
 ====================================================== -->
 
 <script src="script.js"></script>
-
 
 </body>
 

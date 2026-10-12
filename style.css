@@ -655,17 +655,19 @@ body {
 
 
 /* =====================================================
-   MAPA
+   MAPA  (MODIFICADO: más alto, como Viviendas Registradas)
 ===================================================== */
 
 #map {
     width: 100%;
 
-    height: 215px;
+    height: 320px;
 
     border-radius: 7px;
 
     overflow: hidden;
+
+    z-index: 0;
 }
 
 
@@ -718,6 +720,15 @@ td:first-child {
 .second {
     grid-template-columns:
         1.35fr 1fr 1fr;
+}
+
+/* NUEVO: gráficos de la fila del mapa con la misma altura */
+.second .chart-container {
+    height: 320px;
+}
+
+.second .panel {
+    min-height: 370px;
 }
 
 .third {
