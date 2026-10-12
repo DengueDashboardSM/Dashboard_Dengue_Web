@@ -7,7 +7,7 @@ let datosOriginales = [];
 let datosFiltrados = [];
 let charts = {};
 let mapa = null;
-let grupoMarcadores = null;
+let marcadores = [];
 const ARCHIVO_CSV = "datos.csv";
 let busquedaInspector = "";
 
@@ -37,41 +37,23 @@ if (document.readyState === "loading") {
 // CARGAR CSV
 // ============================================================
 
-
 function cargarDatosCSV() {
-    const urlCSV = new URL("./datos.csv", window.location.href).href;
-
-    Papa.parse(urlCSV, {
+    Papa.parse(ARCHIVO_CSV, {
         download: true,
         header: true,
         skipEmptyLines: true,
         encoding: "UTF-8",
-
         complete: function (resultado) {
-            console.log("URL del CSV:", urlCSV);
-            console.log("Registros leídos:", resultado.data.length);
-            console.log("Columnas:", resultado.meta.fields);
-            console.log("Errores:", resultado.errors);
-
-            if (resultado.errors.length > 0) {
-                console.warn("El CSV contiene advertencias:", resultado.errors);
-            }
-
-            if (!resultado.data || resultado.data.length === 0) {
-                fijarTextoFecha("Sin datos", "El CSV está vacío");
-                return;
-            }
-
+            console.log("CSV cargado:", resultado.data.length, "registros");
             procesarDatos(resultado.data);
         },
-
         error: function (error) {
-            console.error("Error al cargar el CSV:", error);
-            fijarTextoFecha("Error", "No se pudo cargar datos.csv");
+            console.error("Error cargando CSV:", error);
+            fijarTextoFecha("Sin datos", "No se pudo cargar datos.csv");
+            alert("No se pudo cargar datos.csv");
         }
     });
 }
-
 
 // ============================================================
 // SEGURIDAD
@@ -157,10 +139,9 @@ function estadoVivienda(f) {
     return "INSPECCIONADA";
 }
 
-
- // ============================================================
- // FECHA
- // ============================================================
+// ============================================================
+// FECHA
+// ============================================================
 
 function obtenerFecha(valor) {
     valor = texto(valor);
@@ -170,39 +151,10 @@ function obtenerFecha(valor) {
     let fecha = null;
     let m;
 
-    // Formato día/mes/año: 01/09/2026 o 01-09-2026
-    if ((m = valor.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})/))) {
-        const dia = Number(m[1]);
-        const mes = Number(m[2]);
-        const anio = Number(m[3]);
-
-        fecha = new Date(anio, mes - 1, dia);
-
-        // Evitar fechas inválidas, como 31/02/2026
-        if (
-            fecha.getFullYear() !== anio ||
-            fecha.getMonth() !== mes - 1 ||
-            fecha.getDate() !== dia
-        ) {
-            return null;
-        }
-
-    // Formato año/mes/día: 2026-09-01
-    } else if ((m = valor.match(/^(\d{4})[\/.-](\d{1,2})[\/.-](\d{1,2})/))) {
-        const anio = Number(m[1]);
-        const mes = Number(m[2]);
-        const dia = Number(m[3]);
-
-        fecha = new Date(anio, mes - 1, dia);
-
-        if (
-            fecha.getFullYear() !== anio ||
-            fecha.getMonth() !== mes - 1 ||
-            fecha.getDate() !== dia
-        ) {
-            return null;
-        }
-
+    if ((m = valor.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/))) {
+        fecha = new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1]));
+    } else if ((m = valor.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/))) {
+        fecha = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
     } else {
         fecha = new Date(valor);
     }
@@ -215,27 +167,35 @@ function fijarTextoFecha(principal, secundario) {
     setTexto("horaActualizacion", secundario);
 }
 
-async function actualizarFecha() {
-    try {
-        const respuesta = await fetch(
-            "./actualizacion.json?v=" + Date.now(),
-            { cache: "no-store" }
-        );
+function actualizarFecha() {
+    const fechas = datosOriginales
+        .map(f => obtenerFecha(f.fecha_inspeccion))
+        .filter(Boolean);
 
-        if (!respuesta.ok) {
-            throw new Error("No se pudo leer actualizacion.json");
-        }
+    const fechaElemento = document.getElementById("fechaActualizacion");
+    const horaElemento = document.getElementById("horaActualizacion");
 
-        const datos = await respuesta.json();
+    if (fechas.length === 0) {
+        if (fechaElemento) fechaElemento.textContent = "Sin fecha";
+        if (horaElemento) horaElemento.innerHTML = "Datos Reales y Registrados";
+        return;
+    }
 
-        fijarTextoFecha(
-            datos.fecha || "Sin fecha",
-            "Hora de actualización: " + (datos.hora || "Sin hora")
-        );
+    let max = fechas[0].getTime();
 
-    } catch (error) {
-        console.error("Error leyendo fecha de actualización:", error);
-        fijarTextoFecha("Sin registro", "Actualización no disponible");
+    fechas.forEach(f => {
+        if (f.getTime() > max) max = f.getTime();
+    });
+
+    const u = new Date(max);
+    const dia = String(u.getDate()).padStart(2, "0");
+    const mes = String(u.getMonth() + 1).padStart(2, "0");
+    const año = u.getFullYear();
+
+    if (fechaElemento) fechaElemento.textContent = `${dia}/${mes}/${año}`;
+
+    if (horaElemento) {
+        horaElemento.innerHTML = `Hora de actualizacion <strong>08:59 a. m.</strong>`;
     }
 }
 
@@ -349,129 +309,76 @@ function valorFiltro(id, porDefecto) {
     return el ? texto(el.value) || porDefecto : porDefecto;
 }
 
-
 function aplicarFiltros() {
+
     const localidad = valorFiltro("filtroLocalidad", "Todas");
     const mes = valorFiltro("filtroMes", "Todos");
     const inspector = valorFiltro("filtroInspector", "Todos");
     const sector = valorFiltro("filtroSector", "Todos");
     const tipo = valorFiltro("filtroTipo", "Todos");
     const manzana = valorFiltro("filtroManzana", "Todas");
-
-    const inicioTexto = valorFiltro("fechaInicio", "");
-    const finTexto = valorFiltro("fechaFin", "");
-
-    // Convertir YYYY-MM-DD a una fecha local sin problemas de zona horaria
-    function convertirFechaInput(valor) {
-        if (!valor) return null;
-
-        const partes = valor.split("-").map(Number);
-        if (partes.length !== 3 || partes.some(n => !Number.isFinite(n))) {
-            return null;
-        }
-
-        const fecha = new Date(partes[0], partes[1] - 1, partes[2]);
-
-        if (
-            fecha.getFullYear() !== partes[0] ||
-            fecha.getMonth() !== partes[1] - 1 ||
-            fecha.getDate() !== partes[2]
-        ) {
-            return null;
-        }
-
-        return fecha;
-    }
-
-    const inicio = convertirFechaInput(inicioTexto);
-    const fin = convertirFechaInput(finTexto);
-    const hayRango = Boolean(inicioTexto || finTexto);
-
-    if (inicioTexto && !inicio) {
-        console.error("La fecha inicial no es válida.");
-        datosFiltrados = [];
-        return;
-    }
-
-    if (finTexto && !fin) {
-        console.error("La fecha final no es válida.");
-        datosFiltrados = [];
-        return;
-    }
-
-    if (inicio && fin && inicio > fin) {
-        console.warn("La fecha inicial no puede ser posterior a la fecha final.");
-        datosFiltrados = [];
-        return;
-    }
+    const fechaSeleccionada = valorFiltro("filtroFecha", "");
 
     datosFiltrados = datosOriginales.filter(fila => {
-        if (
-            localidad !== "Todas" &&
-            texto(fila.localidad_eess) !== localidad
-        ) return false;
 
-        if (
-            inspector !== "Todos" &&
-            texto(fila.nombre_inspector) !== inspector
-        ) return false;
+        if (localidad !== "Todas" && texto(fila.localidad_eess) !== localidad)
+            return false;
 
-        if (
-            sector !== "Todos" &&
-            texto(fila.sector) !== sector
-        ) return false;
+        if (inspector !== "Todos" && texto(fila.nombre_inspector) !== inspector)
+            return false;
 
-        if (
-            tipo !== "Todos" &&
-            texto(fila.tipoActividadInspeccion) !== tipo
-        ) return false;
+        if (sector !== "Todos" && texto(fila.sector) !== sector)
+            return false;
 
-        if (
-            manzana !== "Todas" &&
-            texto(fila.codigo_manzana) !== manzana
-        ) return false;
+        if (tipo !== "Todos" && texto(fila.tipoActividadInspeccion) !== tipo)
+            return false;
 
-        const fecha = obtenerFecha(fila.fecha_inspeccion);
+        if (manzana !== "Todas" && texto(fila.codigo_manzana) !== manzana)
+            return false;
 
-        // Si se indicó un rango, aplicar fecha inicial y final.
-        // El rango tiene prioridad sobre el selector Mes.
-        if (hayRango) {
-            if (!fecha) return false;
-
-            const diaRegistro = new Date(
-                fecha.getFullYear(),
-                fecha.getMonth(),
-                fecha.getDate()
-            );
-
-            if (inicio && diaRegistro < inicio) return false;
-            if (fin && diaRegistro > fin) return false;
-
-        } else if (mes !== "Todos") {
-            if (!fecha || MESES[fecha.getMonth()] !== mes) {
-                return false;
-            }
+        if (mes !== "Todos") {
+            const fecha = obtenerFecha(fila.fecha_inspeccion);
+            if (!fecha || MESES[fecha.getMonth()] !== mes) return false;
         }
 
-        if (
-            busquedaInspector !== "" &&
-            !texto(fila.nombre_inspector)
-                .toLowerCase()
-                .includes(busquedaInspector)
-        ) return false;
+        // FILTRO POR FECHA (calendario)
+        if (fechaSeleccionada !== "") {
+
+            const fecha = obtenerFecha(fila.fecha_inspeccion);
+
+            if (!fecha) return false;
+
+            const clave =
+                fecha.getFullYear() + "-" +
+                String(fecha.getMonth() + 1).padStart(2, "0") + "-" +
+                String(fecha.getDate()).padStart(2, "0");
+
+            if (clave !== fechaSeleccionada) return false;
+        }
+
+        if (busquedaInspector !== "") {
+            if (!texto(fila.nombre_inspector).toLowerCase().includes(busquedaInspector))
+                return false;
+        }
 
         return true;
     });
-
-    console.log("Filtro aplicado:", {
-        registrosCSV: datosOriginales.length,
-        fechaInicio: inicioTexto || "Sin límite inicial",
-        fechaFin: finTexto || "Sin límite final",
-        mes: hayRango ? "Ignorado por rango de fechas" : mes,
-        resultados: datosFiltrados.length
-    });
 }
 
+function actualizarDashboard() {
+    aplicarFiltros();
+
+    seguro("tarjetas", actualizarTarjetas);
+    seguro("cobertura", actualizarCobertura);
+    seguro("condicion", actualizarCondicion);
+    seguro("ranking", actualizarRanking);
+    seguro("mensual", actualizarMensual);
+    seguro("sector", actualizarSector);
+    seguro("inspector", actualizarInspector);
+    seguro("localidad", actualizarLocalidad);
+    seguro("tabla", actualizarTabla);
+    seguro("mapa", actualizarMapa);
+}
 
 // ============================================================
 // TARJETAS
@@ -732,150 +639,26 @@ function actualizarSector() {
     );
 }
 
-
 function actualizarInspector() {
-    configurarLimiteGraficoInspector();
-
-    const canvas = document.getElementById("inspectorChart");
-    if (!canvas || typeof Chart === "undefined") return;
 
     const conteoInspectores = {};
 
-    // Contar los datos reales que ya pasaron por los filtros.
     datosFiltrados.filter(inspeccionada).forEach(fila => {
         const inspector = texto(fila.nombre_inspector) || "Sin inspector";
-        conteoInspectores[inspector] =
-            (conteoInspectores[inspector] || 0) + 1;
+        conteoInspectores[inspector] = (conteoInspectores[inspector] || 0) + 1;
     });
 
-    // Orden descendente por cantidad de viviendas.
-    const rankingCompleto = Object.entries(conteoInspectores)
-        .sort((a, b) => b[1] - a[1] ||
-            a[0].localeCompare(b[0], "es"));
+    const ranking = Object.entries(conteoInspectores).sort((a, b) => b[1] - a[1]);
 
-    // Top 10, Top 15 o todos.
-    const selector = document.getElementById("inspectorChartLimit");
-    const limite = selector ? selector.value : "all";
-
-    const ranking = limite === "all"
-        ? rankingCompleto
-        : rankingCompleto.slice(0, Number(limite));
-
-    const alturaFila = 30;
-    const alturaGrafico = Math.max(220, ranking.length * alturaFila + 36);
-    const alturaVisible = 460;
-
-    const contenedor = canvas.closest(".inspector-chart-scroll");
-    const interior = canvas.parentElement;
-
-    if (contenedor && interior) {
-        contenedor.style.height =
-            Math.min(alturaGrafico, alturaVisible) + "px";
-
-        contenedor.style.maxHeight = alturaVisible + "px";
-        contenedor.style.overflowY =
-            alturaGrafico > alturaVisible ? "auto" : "hidden";
-
-        // El gráfico conserva su altura completa dentro del scroll.
-        interior.style.height = alturaGrafico + "px";
-        interior.style.minHeight = alturaGrafico + "px";
-        interior.style.position = "relative";
-        interior.style.width = "100%";
-    }
-
-    crearGrafico("inspectorChart", {
-        type: "bar",
-
-        data: {
-            labels: ranking.map(x => x[0]),
-
-            datasets: [{
-                label: "Viviendas inspeccionadas",
-                data: ranking.map(x => x[1]),
-                backgroundColor: "#75bce7",
-                borderColor: "#269bb0",
-                borderWidth: 1,
-                borderRadius: 4,
-                borderSkipped: false,
-                barThickness: 17,
-                maxBarThickness: 19
-            }]
-        },
-
-        options: {
-            indexAxis: "y",
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: false,
-
-            layout: {
-                padding: {
-                    left: 8,
-                    right: 16,
-                    top: 8,
-                    bottom: 8
-                }
-            },
-
-            plugins: {
-                legend: {
-                    display: false
-                },
-
-                tooltip: {
-                    callbacks: {
-                        label: context =>
-                            " Viviendas inspeccionadas: " +
-                            fmt(context.raw)
-                    }
-                }
-            },
-
-            scales: {
-                x: {
-                    beginAtZero: true,
-
-                    ticks: {
-                        precision: 0,
-                        callback: value => fmt(value)
-                    },
-
-                    grid: {
-                        color: "rgba(22, 69, 99, 0.08)"
-                    }
-                },
-
-                y: {
-                    offset: true,
-
-                    grid: {
-                        display: false
-                    },
-
-                    ticks: {
-                        autoSkip: false,
-                        padding: 8,
-                        font: {
-                            size: window.innerWidth < 600 ? 10 : 11
-                        }
-                    }
-                }
-            }
-        }
-    });
+    graficoBarras(
+        "inspectorChart",
+        ranking.map(x => x[0]),
+        ranking.map(x => x[1]),
+        "Viviendas inspeccionadas",
+        "#75bce7",
+        true
+    );
 }
-
-function configurarLimiteGraficoInspector() {
-    const selector = document.getElementById("inspectorChartLimit");
-
-    if (!selector || selector.dataset.configurado === "true") {
-        return;
-    }
-
-    selector.addEventListener("change", actualizarInspector);
-    selector.dataset.configurado = "true";
-}
-
 
 function actualizarLocalidad() {
     const o = agruparInspeccionadas("localidad_eess", "Sin localidad");
@@ -960,18 +743,8 @@ function actualizarTabla() {
 }
 
 // ============================================================
-// MAPA (estilo "Viviendas Registradas": círculos agrupados)
+// MAPA
 // ============================================================
-
-function colorEstado(fila) {
-    switch (estadoVivienda(fila)) {
-        case "CERRADA": return "#111111";
-        case "RENUENTE": return "#a855f7";
-        case "DESHABITADA": return "#f97316";
-        case "RECUPERADA": return "#38aa43";
-        default: return "#2563eb"; // inspeccionada
-    }
-}
 
 function inicializarMapa() {
 
@@ -979,123 +752,53 @@ function inicializarMapa() {
 
     if (!elemento || typeof L === "undefined" || mapa) return;
 
-    mapa = L.map("map").setView([-6.4869, -76.3625], 12);
+    mapa = L.map("map").setView([-6.4869, -76.3625], 11);
 
-    // Mapa base claro
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
-        subdomains: "abcd",
-        maxZoom: 19,
-        attribution: "&copy; OpenStreetMap &copy; CARTO"
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap"
     }).addTo(mapa);
-
-    // Círculos azules grandes con el número adentro
-    grupoMarcadores = L.markerClusterGroup({
-        chunkedLoading: true,
-        maxClusterRadius: 60,
-        iconCreateFunction: function (cluster) {
-            const n = cluster.getChildCount();
-            const tam = n < 20 ? 32 : n < 100 ? 42 : 54;
-            return L.divIcon({
-                html: `<div style="width:${tam}px;height:${tam}px;line-height:${tam}px;
-                    border-radius:50%;background:#1d1df0;color:#fff;text-align:center;
-                    font-weight:600;font-size:13px;box-shadow:0 0 0 3px rgba(29,29,240,.25)">${n}</div>`,
-                className: "",
-                iconSize: [tam, tam]
-            });
-        }
-    });
-
-    mapa.addLayer(grupoMarcadores);
-
-    // Leyenda de colores
-    const leyenda = L.control({ position: "topleft" });
-
-    leyenda.onAdd = function () {
-        const div = L.DomUtil.create("div");
-        div.style.cssText =
-            "background:#fff;padding:5px 8px;border-radius:6px;font-size:11px;" +
-            "box-shadow:0 1px 4px rgba(0,0,0,.25);margin-top:70px";
-        div.innerHTML =
-            '<span style="color:#2563eb">●</span> Inspeccionadas &nbsp;' +
-            '<span style="color:#111">●</span> Cerradas &nbsp;' +
-            '<span style="color:#a855f7">●</span> Renuentes &nbsp;' +
-            '<span style="color:#f97316">●</span> Deshabitadas &nbsp;' +
-            '<span style="color:#38aa43">●</span> Recuperadas';
-        return div;
-    };
-
-    leyenda.addTo(mapa);
-
-    // Botón de pantalla completa (arriba a la derecha)
-    const pantalla = L.control({ position: "topright" });
-
-    pantalla.onAdd = function () {
-        const btn = L.DomUtil.create("a", "leaflet-bar");
-        btn.href = "#";
-        btn.title = "Pantalla completa";
-        btn.innerHTML = "⛶";
-        btn.style.cssText =
-            "background:#fff;width:30px;height:30px;line-height:30px;" +
-            "text-align:center;font-size:18px;color:#333;text-decoration:none;display:block";
-        L.DomEvent.on(btn, "click", function (e) {
-            L.DomEvent.preventDefault(e);
-            if (document.fullscreenElement) {
-                document.exitFullscreen();
-            } else {
-                elemento.requestFullscreen();
-            }
-        });
-        return btn;
-    };
-
-    pantalla.addTo(mapa);
-
-    document.addEventListener("fullscreenchange", () => {
-        setTimeout(() => mapa.invalidateSize(), 200);
-    });
 }
 
 function actualizarMapa() {
 
-    if (!mapa || !grupoMarcadores) return;
+    if (!mapa) return;
 
-    grupoMarcadores.clearLayers();
+    marcadores.forEach(m => mapa.removeLayer(m));
 
-    const capas = [];
+    marcadores = [];
 
-    datosFiltrados.forEach(fila => {
+    let contador = 0;
+
+    datosFiltrados.filter(inspeccionada).forEach(fila => {
+
+        if (contador >= 1500) return;
 
         const lat = numero(fila.georeferencia_Y);
         const lng = numero(fila.georeferencia_X);
 
         if (!lat || !lng) return;
+
         if (lat < -20 || lat > 5 || lng < -85 || lng > -65) return;
 
-        const color = colorEstado(fila);
-
         const marcador = L.circleMarker([lat, lng], {
-            radius: 6,
-            color: "#ffffff",
-            weight: 1,
-            fillColor: color,
-            fillOpacity: 0.9
-        }).bindPopup(`
-            <strong>${estadoVivienda(fila)}</strong><br>
-            📍 ${texto(fila.localidad_eess)}<br>
-            🏠 ${texto(fila.direccion)}<br>
-            👤 ${texto(fila.nombre_inspector)}<br>
-            📅 ${texto(fila.fecha_inspeccion)}
-        `);
+            radius: 4,
+            color: "#078ca5",
+            fillColor: "#269bb0",
+            fillOpacity: 0.55,
+            weight: 1
+        })
+            .bindPopup(`
+                <strong>Vivienda inspeccionada</strong><br>
+                📍 ${texto(fila.localidad_eess)}<br>
+                🏠 ${texto(fila.direccion)}<br>
+                👤 ${texto(fila.nombre_inspector)}
+            `)
+            .addTo(mapa);
 
-        capas.push(marcador);
+        marcadores.push(marcador);
+
+        contador++;
     });
-
-    grupoMarcadores.addLayers(capas);
-
-    // Zoom automático a las viviendas filtradas
-    if (capas.length > 0) {
-        mapa.fitBounds(grupoMarcadores.getBounds(), { padding: [20, 20], maxZoom: 16 });
-    }
 }
 
 // ============================================================
