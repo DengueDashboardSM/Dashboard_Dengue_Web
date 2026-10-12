@@ -349,76 +349,129 @@ function valorFiltro(id, porDefecto) {
     return el ? texto(el.value) || porDefecto : porDefecto;
 }
 
-function aplicarFiltros() {
 
+function aplicarFiltros() {
     const localidad = valorFiltro("filtroLocalidad", "Todas");
     const mes = valorFiltro("filtroMes", "Todos");
     const inspector = valorFiltro("filtroInspector", "Todos");
     const sector = valorFiltro("filtroSector", "Todos");
     const tipo = valorFiltro("filtroTipo", "Todos");
     const manzana = valorFiltro("filtroManzana", "Todas");
-    const fechaSeleccionada = valorFiltro("filtroFecha", "");
+
+    const inicioTexto = valorFiltro("fechaInicio", "");
+    const finTexto = valorFiltro("fechaFin", "");
+
+    // Convertir YYYY-MM-DD a una fecha local sin problemas de zona horaria
+    function convertirFechaInput(valor) {
+        if (!valor) return null;
+
+        const partes = valor.split("-").map(Number);
+        if (partes.length !== 3 || partes.some(n => !Number.isFinite(n))) {
+            return null;
+        }
+
+        const fecha = new Date(partes[0], partes[1] - 1, partes[2]);
+
+        if (
+            fecha.getFullYear() !== partes[0] ||
+            fecha.getMonth() !== partes[1] - 1 ||
+            fecha.getDate() !== partes[2]
+        ) {
+            return null;
+        }
+
+        return fecha;
+    }
+
+    const inicio = convertirFechaInput(inicioTexto);
+    const fin = convertirFechaInput(finTexto);
+    const hayRango = Boolean(inicioTexto || finTexto);
+
+    if (inicioTexto && !inicio) {
+        console.error("La fecha inicial no es válida.");
+        datosFiltrados = [];
+        return;
+    }
+
+    if (finTexto && !fin) {
+        console.error("La fecha final no es válida.");
+        datosFiltrados = [];
+        return;
+    }
+
+    if (inicio && fin && inicio > fin) {
+        console.warn("La fecha inicial no puede ser posterior a la fecha final.");
+        datosFiltrados = [];
+        return;
+    }
 
     datosFiltrados = datosOriginales.filter(fila => {
+        if (
+            localidad !== "Todas" &&
+            texto(fila.localidad_eess) !== localidad
+        ) return false;
 
-        if (localidad !== "Todas" && texto(fila.localidad_eess) !== localidad)
-            return false;
+        if (
+            inspector !== "Todos" &&
+            texto(fila.nombre_inspector) !== inspector
+        ) return false;
 
-        if (inspector !== "Todos" && texto(fila.nombre_inspector) !== inspector)
-            return false;
+        if (
+            sector !== "Todos" &&
+            texto(fila.sector) !== sector
+        ) return false;
 
-        if (sector !== "Todos" && texto(fila.sector) !== sector)
-            return false;
+        if (
+            tipo !== "Todos" &&
+            texto(fila.tipoActividadInspeccion) !== tipo
+        ) return false;
 
-        if (tipo !== "Todos" && texto(fila.tipoActividadInspeccion) !== tipo)
-            return false;
+        if (
+            manzana !== "Todas" &&
+            texto(fila.codigo_manzana) !== manzana
+        ) return false;
 
-        if (manzana !== "Todas" && texto(fila.codigo_manzana) !== manzana)
-            return false;
+        const fecha = obtenerFecha(fila.fecha_inspeccion);
 
-        if (mes !== "Todos") {
-            const fecha = obtenerFecha(fila.fecha_inspeccion);
-            if (!fecha || MESES[fecha.getMonth()] !== mes) return false;
-        }
-
-        // FILTRO POR FECHA (calendario)
-        if (fechaSeleccionada !== "") {
-
-            const fecha = obtenerFecha(fila.fecha_inspeccion);
-
+        // Si se indicó un rango, aplicar fecha inicial y final.
+        // El rango tiene prioridad sobre el selector Mes.
+        if (hayRango) {
             if (!fecha) return false;
 
-            const clave =
-                fecha.getFullYear() + "-" +
-                String(fecha.getMonth() + 1).padStart(2, "0") + "-" +
-                String(fecha.getDate()).padStart(2, "0");
+            const diaRegistro = new Date(
+                fecha.getFullYear(),
+                fecha.getMonth(),
+                fecha.getDate()
+            );
 
-            if (clave !== fechaSeleccionada) return false;
-        }
+            if (inicio && diaRegistro < inicio) return false;
+            if (fin && diaRegistro > fin) return false;
 
-        if (busquedaInspector !== "") {
-            if (!texto(fila.nombre_inspector).toLowerCase().includes(busquedaInspector))
+        } else if (mes !== "Todos") {
+            if (!fecha || MESES[fecha.getMonth()] !== mes) {
                 return false;
+            }
         }
+
+        if (
+            busquedaInspector !== "" &&
+            !texto(fila.nombre_inspector)
+                .toLowerCase()
+                .includes(busquedaInspector)
+        ) return false;
 
         return true;
     });
+
+    console.log("Filtro aplicado:", {
+        registrosCSV: datosOriginales.length,
+        fechaInicio: inicioTexto || "Sin límite inicial",
+        fechaFin: finTexto || "Sin límite final",
+        mes: hayRango ? "Ignorado por rango de fechas" : mes,
+        resultados: datosFiltrados.length
+    });
 }
 
-function actualizarDashboard() {
-    aplicarFiltros();
-
-    seguro("tarjetas", actualizarTarjetas);
-    seguro("cobertura", actualizarCobertura);
-    seguro("condicion", actualizarCondicion);
-    seguro("ranking", actualizarRanking);
-    seguro("mensual", actualizarMensual);
-    seguro("sector", actualizarSector);
-    seguro("inspector", actualizarInspector);
-    seguro("localidad", actualizarLocalidad);
-    seguro("tabla", actualizarTabla);
-    seguro("mapa", actualizarMapa);
-}
 
 // ============================================================
 // TARJETAS
