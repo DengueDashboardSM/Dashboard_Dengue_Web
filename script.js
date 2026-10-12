@@ -195,7 +195,7 @@ function actualizarFecha() {
     if (fechaElemento) fechaElemento.textContent = `${dia}/${mes}/${año}`;
 
     if (horaElemento) {
-        horaElemento.innerHTML = `Hora de actualizacion <strong>09:59 a. m.</strong>`;
+        horaElemento.innerHTML = `Hora de actualizacion <strong>08:06 a. m.</strong>`;
     }
 }
 
