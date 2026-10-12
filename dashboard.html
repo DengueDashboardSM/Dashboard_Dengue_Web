@@ -79,53 +79,78 @@
         </select>
     </div>
 
-    <!-- MES Y CALENDARIO -->
-    <div class="filter">
+    
+<!-- MES Y RANGO DE FECHAS -->
+<div class="filter">
 
-        <label for="filtroMes">📅 Mes</label>
+    <label for="filtroMes">📅 Mes</label>
 
-        <select id="filtroMes">
-            <option value="Todos">Todos</option>
-        </select>
+    <select id="filtroMes">
+        <option value="Todos">Todos</option>
+    </select>
 
-        <label for="filtroFecha" style="margin-top: 8px;">🗓️ Seleccionar fecha</label>
+    <label for="fechaInicio" style="margin-top: 8px;">
+        🗓️ Fecha inicial
+    </label>
 
-        <input
-            type="date"
-            id="filtroFecha"
-            style="
-                width: 100%;
-                box-sizing: border-box;
-                height: 36px;
-                margin-top: 5px;
-                padding: 6px 8px;
-                border: 1px solid #cbd8df;
-                border-radius: 7px;
-                background: white;
-                color: #263746;
-                font-size: 12px;
-            "
-        >
+    <input
+        type="date"
+        id="fechaInicio"
+        style="
+            width: 100%;
+            box-sizing: border-box;
+            height: 36px;
+            margin-top: 5px;
+            padding: 6px 8px;
+            border: 1px solid #cbd8df;
+            border-radius: 7px;
+            background: white;
+            color: #263746;
+            font-size: 12px;
+        "
+    >
 
-        <button
-            id="btnLimpiarFecha"
-            type="button"
-            style="
-                width: 100%;
-                margin-top: 6px;
-                padding: 7px;
-                border: none;
-                border-radius: 6px;
-                background: #078ca5;
-                color: white;
-                font-weight: bold;
-                cursor: pointer;
-            "
-        >
-            ↺ Limpiar fecha
-        </button>
+    <label for="fechaFin" style="margin-top: 8px;">
+        🗓️ Fecha final
+    </label>
 
-    </div>
+    <input
+        type="date"
+        id="fechaFin"
+        style="
+            width: 100%;
+            box-sizing: border-box;
+            height: 36px;
+            margin-top: 5px;
+            padding: 6px 8px;
+            border: 1px solid #cbd8df;
+            border-radius: 7px;
+            background: white;
+            color: #263746;
+            font-size: 12px;
+        "
+    >
+
+    <button
+        id="btnLimpiarFecha"
+        type="button"
+        style="
+            width: 100%;
+            margin-top: 6px;
+            padding: 7px;
+            border: none;
+            border-radius: 6px;
+            background: #078ca5;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        "
+    >
+        ↺ Limpiar fechas
+    </button>
+
+</div>
+
 
     <!-- INSPECTOR -->
     <div class="filter">
