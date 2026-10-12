@@ -129,23 +129,58 @@
     </div>
 
 
-    <!-- MES -->
+    <!-- MES Y CALENDARIO -->
 
-    <div class="filter">
+<div class="filter">
 
-        <label>
-            📅 Mes
-        </label>
+    <label for="filtroMes">
+        📅 Mes
+    </label>
 
-        <select id="filtroMes">
+    <select id="filtroMes">
+        <option value="Todos">Todos</option>
+    </select>
 
-            <option value="Todos">
-                Todos
-            </option>
+    <label for="filtroFecha" style="margin-top: 8px;">
+        🗓️ Seleccionar fecha
+    </label>
 
-        </select>
+    <input
+        type="date"
+        id="filtroFecha"
+        style="
+            width: 100%;
+            box-sizing: border-box;
+            height: 36px;
+            margin-top: 5px;
+            padding: 6px 8px;
+            border: 1px solid #cbd8df;
+            border-radius: 7px;
+            background: white;
+            color: #263746;
+            font-size: 12px;
+        "
+    >
 
-    </div>
+    <button
+        id="btnLimpiarFecha"
+        type="button"
+        style="
+            width: 100%;
+            margin-top: 6px;
+            padding: 7px;
+            border: none;
+            border-radius: 6px;
+            background: #078ca5;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        "
+    >
+        ↺ Limpiar fecha
+    </button>
+
+</div>
 
 
     <!-- INSPECTOR -->
