@@ -897,9 +897,7 @@ function actualizarCobertura() {
 // GRÁFICOS
 // ============================================================
 
-function opcionesBarras(
-    horizontal
-) {
+function opcionesBarras(horizontal) {
 
     const eje = {
         beginAtZero: true
@@ -907,17 +905,22 @@ function opcionesBarras(
 
     return {
 
-        indexAxis:
-            horizontal
-                ? "y"
-                : "x",
+        indexAxis: horizontal ? "y" : "x",
 
         responsive: true,
 
-        maintainAspectRatio:
-            false,
+        maintainAspectRatio: false,
 
         animation: false,
+
+        layout: {
+            padding: {
+                left: horizontal ? 120 : 5,
+                right: 10,
+                top: 5,
+                bottom: 5
+            }
+        },
 
         plugins: {
             legend: {
@@ -925,10 +928,23 @@ function opcionesBarras(
             }
         },
 
-        scales:
-            horizontal
-                ? { x: eje }
-                : { y: eje }
+        scales: horizontal
+            ? {
+                x: eje,
+
+                y: {
+                    ticks: {
+                        autoSkip: false,
+                        padding: 8,
+                        font: {
+                            size: 10
+                        }
+                    }
+                }
+            }
+            : {
+                y: eje
+            }
     };
 }
 
