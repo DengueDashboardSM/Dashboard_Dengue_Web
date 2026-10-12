@@ -300,29 +300,30 @@ function obtenerFecha(valor) {
 
     let fecha = null;
 
-    let m;
+function obtenerFecha(valor) {
+    valor = texto(valor);
+    if (!valor) return null;
 
+    let m;
+    let fecha;
 
+    m = valor.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})/);
 
-    if ((m = valor.match(/^(\d{1,2})[**\\/\\-**]\(\d{1,2})[**\\/\\-**]\(\d{4})/))) {
+    if (m) {
+        fecha = new Date(+m[3], +m[2] - 1, +m[1]);
+    } else {
+        m = valor.match(/^(\d{4})[\/.-](\d{1,2})[\/.-](\d{1,2})/);
 
-        fecha = new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1]));
+        if (m) {
+            fecha = new Date(+m[1], +m[2] - 1, +m[3]);
+        } else {
+            fecha = new Date(valor);
+        }
+    }
 
-    } else if ((m = valor.match(/^(\d{4})[**\\/\\-**]\(\d{1,2})[**\\/\\-**]\(\d{1,2})/))) {
-
-        fecha = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
-
-    } else {
-
-        fecha = new Date(valor);
-
-    }
-
-
-
-    return fecha && !isNaN(fecha.getTime()) ? fecha : null;
-
+    return !isNaN(fecha.getTime()) ? fecha : null;
 }
+
 
 
 
