@@ -37,23 +37,28 @@ if (document.readyState === "loading") {
 // CARGAR CSV
 // ============================================================
 
+
 function cargarDatosCSV() {
-    Papa.parse(ARCHIVO_CSV, {
+    const urlCSV = new URL("./datos.csv", window.location.href).href;
+
+    Papa.parse(urlCSV, {
         download: true,
         header: true,
         skipEmptyLines: true,
         encoding: "UTF-8",
+
         complete: function (resultado) {
             console.log("CSV cargado:", resultado.data.length, "registros");
             procesarDatos(resultado.data);
         },
+
         error: function (error) {
-            console.error("Error cargando CSV:", error);
-            fijarTextoFecha("Sin datos", "No se pudo cargar datos.csv");
-            alert("No se pudo cargar datos.csv");
+            console.error("Error al cargar el CSV:", error);
+            fijarTextoFecha("Error", "No se pudo cargar datos.csv");
         }
     });
 }
+
 
 // ============================================================
 // SEGURIDAD
