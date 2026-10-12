@@ -48,7 +48,20 @@ function cargarDatosCSV() {
         encoding: "UTF-8",
 
         complete: function (resultado) {
-            console.log("CSV cargado:", resultado.data.length, "registros");
+            console.log("URL del CSV:", urlCSV);
+            console.log("Registros leídos:", resultado.data.length);
+            console.log("Columnas:", resultado.meta.fields);
+            console.log("Errores:", resultado.errors);
+
+            if (resultado.errors.length > 0) {
+                console.warn("El CSV contiene advertencias:", resultado.errors);
+            }
+
+            if (!resultado.data || resultado.data.length === 0) {
+                fijarTextoFecha("Sin datos", "El CSV está vacío");
+                return;
+            }
+
             procesarDatos(resultado.data);
         },
 
