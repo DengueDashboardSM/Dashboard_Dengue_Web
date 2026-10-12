@@ -161,6 +161,7 @@ function estadoVivienda(f) {
 // FECHA
 // ============================================================
 
+
 function obtenerFecha(valor) {
     valor = texto(valor);
 
@@ -169,19 +170,23 @@ function obtenerFecha(valor) {
     let fecha = null;
     let m;
 
-    if ((m = valor.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})/))) {
+    // Formato DD/MM/AAAA, DD-MM-AAAA o DD.MM.AAAA
+    if ((m = valor.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/))) {
         fecha = new Date(
             Number(m[3]),
             Number(m[2]) - 1,
             Number(m[1])
         );
-    } else if ((m = valor.match(/^(\d{4})[\/.-](\d{1,2})[\/.-](\d{1,2})/))) {
+    }
+    // Formato AAAA/MM/DD, AAAA-MM-DD o AAAA.MM.DD
+    else if ((m = valor.match(/^(\d{4})[\/.-](\d{1,2})[\/.-](\d{1,2})$/))) {
         fecha = new Date(
             Number(m[1]),
             Number(m[2]) - 1,
             Number(m[3])
         );
-    } else {
+    }
+    else {
         fecha = new Date(valor);
     }
 
@@ -194,28 +199,13 @@ function fijarTextoFecha(principal, secundario) {
 }
 
 async function actualizarFecha() {
-    try {
-        const respuesta = await fetch(
-            "./actualizacion.json?v=" + Date.now(),
-            { cache: "no-store" }
-        );
-
-        if (!respuesta.ok) {
-            throw new Error("No se pudo leer actualizacion.json");
-        }
-
-        const datos = await respuesta.json();
-
-        fijarTextoFecha(
-            datos.fecha || "Sin fecha",
-            "Hora de actualización: " + (datos.hora || "Sin hora")
-        );
-
-    } catch (error) {
-        console.error("Error leyendo fecha de actualización:", error);
-        fijarTextoFecha("Sin registro", "Actualización no disponible");
-    }
+    // Fecha y hora fijas de la última actualización del CSV.
+    fijarTextoFecha(
+        "12/10/2026",
+        "Hora de actualización: 08:06 a. m."
+    );
 }
+
 
 // ============================================================
 // FILTROS
