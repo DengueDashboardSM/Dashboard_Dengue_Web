@@ -1095,3 +1095,111 @@ aplicarFiltros = function () {
     aplicarFiltrosOriginal();
     datosFiltrados = quitarCerradasRevisitadas(datosFiltrados);
 };
+
+// ============================================================
+// RANGO DE FECHAS (HOY A MAÑANA) + ACTUALIZACIÓN AUTOMÁTICA
+// ============================================================
+
+(function () {
+
+    // ---------- Utilidades ----------
+    function fechaLocalISO(d) {
+        return d.getFullYear() + "-" +
+            String(d.getMonth() + 1).padStart(2, "0") + "-" +
+            String(d.getDate()).padStart(2, "0");
+    }
+
+    function leerFechaFila(valor) {
+        if (typeof obtenerFecha === "function") return obtenerFecha(valor);
+        const d = new Date(valor);
+        return isNaN(d.getTime()) ? null : d;
+    }
+
+    // ---------- 1. Rango por defecto: hoy -> mañana ----------
+    function ponerRangoHoyManana() {
+        const inicio = document.getElementById("fechaInicio");
+        const fin = document.getElementById("fechaFin");
+        if (!inicio || !fin) return;
+
+        const hoy = new Date();
+        const manana = new Date();
+        manana.setDate(hoy.getDate() + 1);
+
+        inicio.value = fechaLocalISO(hoy);
+        fin.value = fechaLocalISO(manana);
+    }
+
+    ponerRangoHoyManana();
+
+    // ---------- 2. Filtro por rango (se suma a tus filtros actuales) ----------
+    const aplicarFiltrosSinRango = aplicarFiltros;
+
+    aplicarFiltros = function () {
+        aplicarFiltrosSinRango();
+
+        const inicio = document.getElementById("fechaInicio");
+        const fin = document.getElementById("fechaFin");
+
+        const vInicio = inicio ? inicio.value : "";
+        const vFin = fin ? fin.value : "";
+
+        if (!vInicio && !vFin) return;
+
+        const desde = vInicio ? new Date(vInicio + "T00:00:00") : null;
+        const hasta = vFin ? new Date(vFin + "T23:59:59") : null;
+
+        datosFiltrados = datosFiltrados.filter(fila => {
+            const fecha = leerFechaFila(fila.fecha_inspeccion);
+            if (!fecha) return false;
+            if (desde && fecha < desde) return false;
+            if (hasta && fecha > hasta) return false;
+            return true;
+        });
+    };
+
+    // ---------- 3. Que los calendarios actualicen todo al cambiar ----------
+    ["fechaInicio", "fechaFin"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener("change", actualizarDashboard);
+    });
+
+    // El botón "Limpiar fechas" vuelve a hoy -> mañana
+    const btnLimpiar = document.getElementById("btnLimpiarFecha");
+    if (btnLimpiar) {
+        btnLimpiar.addEventListener("click", function () {
+            setTimeout(function () {
+                ponerRangoHoyManana();
+                actualizarDashboard();
+            }, 0);
+        });
+    }
+
+    // ---------- 4. Actualización automática (tiempo real) ----------
+    const SEGUNDOS_ACTUALIZACION = 60;
+
+    function recargarCSV() {
+        if (document.hidden) return;   // no recarga si la pestaña está oculta
+
+        Papa.parse(ARCHIVO_CSV + "?v=" + Date.now(), {
+            download: true,
+            header: true,
+            skipEmptyLines: true,
+            complete: function (resultado) {
+                if (!resultado.data || resultado.data.length === 0) return;
+
+                datosOriginales = resultado.data.filter(
+                    fila => fila && Object.keys(fila).length > 1
+                );
+
+                if (typeof actualizarFecha === "function") actualizarFecha();
+                actualizarDashboard();
+            },
+            error: function (e) {
+                console.error("Error al actualizar datos.csv:", e);
+            }
+        });
+    }
+
+    setInterval(recargarCSV, SEGUNDOS_ACTUALIZACION * 1000);
+
+})();
