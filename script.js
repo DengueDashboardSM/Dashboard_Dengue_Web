@@ -308,12 +308,6 @@ function configurarRangoFechas() {
     const fechaFin = document.getElementById("fechaFin");
     const btnLimpiarFecha = document.getElementById("btnLimpiarFecha");
 
-    // Si no hay fechas elegidas, usar hoy hasta mañana.
-    if (fechaInicio && fechaFin &&
-        !fechaInicio.value && !fechaFin.value) {
-        ponerRangoHoyManana();
-    }
-
     [fechaInicio, fechaFin].forEach(el => {
         if (!el || el.dataset.configurado === "true") return;
 
