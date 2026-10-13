@@ -34,11 +34,11 @@ if (document.readyState === "loading") {
 }
 
 // ============================================================
-// CARGAR CSV
+// CARGAR CSV (sin caché: siempre baja la versión más reciente)
 // ============================================================
 
 function cargarDatosCSV() {
-    Papa.parse(ARCHIVO_CSV, {
+    Papa.parse(ARCHIVO_CSV + "?v=" + Date.now(), {
         download: true,
         header: true,
         skipEmptyLines: true,
@@ -167,37 +167,24 @@ function fijarTextoFecha(principal, secundario) {
     setTexto("horaActualizacion", secundario);
 }
 
-
-
+// Muestra la fecha y hora REALES de hoy (momento en que se carga el dashboard)
 function actualizarFecha() {
-    const fechas = datosOriginales
-        .map(f => obtenerFecha(f.fecha_inspeccion))
-        .filter(Boolean);
+    const ahora = new Date();
 
-    if (fechas.length === 0) {
-        fijarTextoFecha("Sin fecha", "No hay fechas válidas en el CSV");
-        return;
-    }
-
-    const ultimaFecha = new Date(
-        Math.max(...fechas.map(f => f.getTime()))
-    );
-
-    const fechaTexto = ultimaFecha.toLocaleDateString("es-PE", {
+    const fechaTexto = ahora.toLocaleDateString("es-PE", {
         day: "2-digit",
         month: "2-digit",
         year: "numeric"
     });
 
-    const horaTexto = ultimaFecha.toLocaleTimeString("es-PE", {
+    const horaTexto = ahora.toLocaleTimeString("es-PE", {
         hour: "2-digit",
         minute: "2-digit",
         hour12: true
     });
 
-    fijarTextoFecha(fechaTexto, "Último registro: " + horaTexto);
+    fijarTextoFecha(fechaTexto, "Actualizado: " + horaTexto);
 }
-
 
 // ============================================================
 // FILTROS
