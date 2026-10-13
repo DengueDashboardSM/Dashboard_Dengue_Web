@@ -167,6 +167,7 @@ function fijarTextoFecha(principal, secundario) {
     setTexto("horaActualizacion", secundario);
 }
 
+
 function actualizarFecha() {
     const fechas = datosOriginales
         .map(f => obtenerFecha(f.fecha_inspeccion))
@@ -177,27 +178,28 @@ function actualizarFecha() {
 
     if (fechas.length === 0) {
         if (fechaElemento) fechaElemento.textContent = "Sin fecha";
-        if (horaElemento) horaElemento.innerHTML = "Datos Reales y Registrados";
+        if (horaElemento) horaElemento.textContent = "Datos reales y registrados";
         return;
     }
 
-    let max = fechas[0].getTime();
+    const ultimaFecha = new Date(
+        Math.max(...fechas.map(f => f.getTime()))
+    );
 
-    fechas.forEach(f => {
-        if (f.getTime() > max) max = f.getTime();
-    });
+    const dia = String(ultimaFecha.getDate()).padStart(2, "0");
+    const mes = String(ultimaFecha.getMonth() + 1).padStart(2, "0");
+    const anio = ultimaFecha.getFullYear();
 
-    const u = new Date(max);
-    const dia = String(u.getDate()).padStart(2, "0");
-    const mes = String(u.getMonth() + 1).padStart(2, "0");
-    const año = u.getFullYear();
-
-    if (fechaElemento) fechaElemento.textContent = `${dia}/${mes}/${año}`;
+    if (fechaElemento) {
+        fechaElemento.textContent = `$13}/${10}/${2026}`;
+    }
 
     if (horaElemento) {
-        horaElemento.innerHTML = `Hora de actualizacion <strong>08:59 a. m.</strong>`;
+        horaElemento.innerHTML =
+            'Hora de actualización: <strong>08:26 a. m.</strong>';
     }
 }
+
 
 // ============================================================
 // FILTROS
