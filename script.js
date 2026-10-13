@@ -168,17 +168,14 @@ function fijarTextoFecha(principal, secundario) {
 }
 
 
+
 function actualizarFecha() {
     const fechas = datosOriginales
         .map(f => obtenerFecha(f.fecha_inspeccion))
         .filter(Boolean);
 
-    const fechaElemento = document.getElementById("fechaActualizacion");
-    const horaElemento = document.getElementById("horaActualizacion");
-
     if (fechas.length === 0) {
-        if (fechaElemento) fechaElemento.textContent = "Sin fecha";
-        if (horaElemento) horaElemento.textContent = "Datos reales y registrados";
+        fijarTextoFecha("Sin fecha", "No hay fechas válidas en el CSV");
         return;
     }
 
@@ -186,18 +183,19 @@ function actualizarFecha() {
         Math.max(...fechas.map(f => f.getTime()))
     );
 
-    const dia = String(ultimaFecha.getDate()).padStart(2, "0");
-    const mes = String(ultimaFecha.getMonth() + 1).padStart(2, "0");
-    const anio = ultimaFecha.getFullYear();
+    const fechaTexto = ultimaFecha.toLocaleDateString("es-PE", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+    });
 
-    if (fechaElemento) {
-        fechaElemento.textContent = `$13}/${10}/${2026}`;
-    }
+    const horaTexto = ultimaFecha.toLocaleTimeString("es-PE", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true
+    });
 
-    if (horaElemento) {
-        horaElemento.innerHTML =
-            'Hora de actualización: <strong>08:26 a. m.</strong>';
-    }
+    fijarTextoFecha(fechaTexto, "Último registro: " + horaTexto);
 }
 
 
