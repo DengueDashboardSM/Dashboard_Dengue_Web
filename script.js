@@ -381,6 +381,7 @@ function llenarSelect(id, valores, inicial) {
     }
 }
 
+
 function inicializarFiltros() {
     llenarSelect("filtroLocalidad", valoresUnicos("localidad_eess"), "Todas");
     llenarSelect("filtroInspector", valoresUnicos("nombre_inspector"), "Todos");
@@ -388,6 +389,13 @@ function inicializarFiltros() {
     llenarSelect("filtroTipo", valoresUnicos("tipoActividadInspeccion"), "Todos");
     llenarSelect("filtroManzana", valoresUnicos("codigo_manzana"), "Todas");
     llenarSelect("filtroMes", MESES, "Todos");
+
+    // Dejar las fechas vacías al iniciar el dashboard.
+    const fechaInicio = document.getElementById("fechaInicio");
+    const fechaFin = document.getElementById("fechaFin");
+
+    if (fechaInicio) fechaInicio.value = "";
+    if (fechaFin) fechaFin.value = "";
 
     configurarRangoFechas();
 
@@ -407,6 +415,7 @@ function inicializarFiltros() {
         }
     });
 }
+
 
 function valorFiltro(id, porDefecto) {
     const el = document.getElementById(id);
