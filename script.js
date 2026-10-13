@@ -1063,3 +1063,35 @@ function descargarDirecciones() {
 }
 
 console.log("Dashboard Dengue cargado correctamente.");
+
+// ============================================================
+// CORRECCIÓN: cerradas que luego fueron inspeccionadas
+// ============================================================
+
+function claveVivienda(f) {
+    const dir = texto(f.direccion).toLowerCase();
+    const mz = texto(f.codigo_manzana);
+
+    if (dir) return dir + "|" + mz;
+
+    return "geo|" + texto(f.georeferencia_X) + "|" + texto(f.georeferencia_Y);
+}
+
+function quitarCerradasRevisitadas(filas) {
+    const inspeccionadasSet = new Set(
+        filas.filter(inspeccionada).map(claveVivienda)
+    );
+
+    return filas.filter(f => {
+        if (!cerrada(f)) return true;
+        return !inspeccionadasSet.has(claveVivienda(f));
+    });
+}
+
+// Se envuelve aplicarFiltros para aplicar la corrección automáticamente
+const aplicarFiltrosOriginal = aplicarFiltros;
+
+aplicarFiltros = function () {
+    aplicarFiltrosOriginal();
+    datosFiltrados = quitarCerradasRevisitadas(datosFiltrados);
+};
