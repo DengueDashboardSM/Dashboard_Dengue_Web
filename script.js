@@ -520,7 +520,7 @@ function aplicarFiltros() {
         return true;
     });
 
-    // Igual que Dengue-Admin: se cuentan todos los registros, incluidas las cerradas revisitadas.
+// Igual que Dengue-Admin: se cuentan todos los registros, incluidas las cerradas revisitadas.
 datosFiltrados = filasFiltradas;
 }
 
