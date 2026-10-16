@@ -11,7 +11,8 @@ let mapa = null;
 let marcadores = [];
 let busquedaInspector = "";
 
-const ARCHIVO_CSV = "datos.csv";
+const ARCHIVO_CSV = "datos.csv.gz";
+const ARCHIVO_CSV_RESPALDO = "datos.csv";
 const SEGUNDOS_ACTUALIZACION = 60;
 
 const MESES = [
@@ -59,23 +60,63 @@ if (document.readyState === "loading") {
 // CARGAR CSV
 // ============================================================
 
-function cargarDatosCSV(esActualizacionAutomatica = false) {
+// Descarga datos.csv.gz y lo descomprime en el navegador.
+// Si no existe el .gz (o el navegador es antiguo), usa datos.csv como respaldo.
+async function leerTextoCSV() {
+    const version = "?v=" + Date.now();
+
+    if (typeof DecompressionStream !== "undefined") {
+        const urlGz = new URL(ARCHIVO_CSV, window.location.href).href + version;
+        const resp = await fetch(urlGz, { cache: "no-store" });
+
+        if (resp.ok) {
+            const buffer = await resp.arrayBuffer();
+            const bytes = new Uint8Array(buffer);
+
+            // Si el archivo empieza con la firma gzip (1F 8B), se descomprime.
+            if (bytes.length > 2 && bytes[0] === 0x1f && bytes[1] === 0x8b) {
+                const stream = new Blob([buffer]).stream()
+                    .pipeThrough(new DecompressionStream("gzip"));
+                return await new Response(stream).text();
+            }
+
+            // Si el servidor ya lo entregó descomprimido, se lee directo.
+            return new TextDecoder("utf-8").decode(buffer);
+        }
+    }
+
+    // Respaldo: CSV sin comprimir.
+    const urlCsv = new URL(ARCHIVO_CSV_RESPALDO, window.location.href).href + version;
+    const resp2 = await fetch(urlCsv, { cache: "no-store" });
+    if (!resp2.ok) throw new Error("No se encontró datos.csv.gz ni datos.csv");
+    return await resp2.text();
+}
+
+async function cargarDatosCSV(esActualizacionAutomatica = false) {
+
     if (typeof Papa === "undefined") {
         console.error("No se encontró Papa Parse.");
         fijarTextoFecha("Error", "No se cargó la librería Papa Parse");
         return;
     }
 
-    const urlCSV = new URL(ARCHIVO_CSV, window.location.href).href
-        + "?v=" + Date.now();
+    let textoCSV;
+    try {
+        textoCSV = await leerTextoCSV();
+    } catch (error) {
+        console.error("Error cargando CSV:", error);
+        if (!esActualizacionAutomatica) {
+            fijarTextoFecha("Sin datos", "No se pudo cargar datos.csv.gz");
+        }
+        return;
+    }
 
-    Papa.parse(urlCSV, {
-        download: true,
+    Papa.parse(textoCSV, {
         header: true,
         skipEmptyLines: true,
-        encoding: "UTF-8",
 
         complete: function (resultado) {
+
             if (resultado.errors && resultado.errors.length) {
                 console.warn("Advertencias del CSV:", resultado.errors);
             }
@@ -95,12 +136,7 @@ function cargarDatosCSV(esActualizacionAutomatica = false) {
             datosOriginales = registros;
             ultimaCargaCSV = Date.now();
 
-            console.log(
-                "CSV cargado:",
-                datosOriginales.length,
-                "registros"
-            );
-
+            console.log("CSV cargado:", datosOriginales.length, "registros");
             console.log("Columnas:", Object.keys(datosOriginales[0]));
 
             // Actualiza los filtros conservando las selecciones existentes.
@@ -109,14 +145,6 @@ function cargarDatosCSV(esActualizacionAutomatica = false) {
             seguro("actualizarFecha", actualizarFecha);
             seguro("inicializarMapa", inicializarMapa);
             seguro("actualizarDashboard", actualizarDashboard);
-        },
-
-        error: function (error) {
-            console.error("Error cargando CSV:", error);
-
-            if (!esActualizacionAutomatica) {
-                fijarTextoFecha("Sin datos", "No se pudo cargar datos.csv");
-            }
         }
     });
 }
