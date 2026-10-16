@@ -520,7 +520,8 @@ function aplicarFiltros() {
         return true;
     });
 
-    datosFiltrados = quitarCerradasRevisitadas(filasFiltradas);
+    // Igual que Dengue-Admin: se cuentan todos los registros, incluidas las cerradas revisitadas.
+datosFiltrados = filasFiltradas;
 }
 
 // ============================================================
